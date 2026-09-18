@@ -17,6 +17,28 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(PatientNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handlePatientNotFound(PatientNotFoundException ex, HttpServletRequest request) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(DuplicatePatientIdException.class)
+    public ResponseEntity<ErrorResponseDto> handleDuplicatePatientId(DuplicatePatientIdException ex, HttpServletRequest request) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleUserAlreadyExists(UserAlreadyExistsException ex, HttpServletRequest request) {
         ErrorResponseDto error = new ErrorResponseDto(
