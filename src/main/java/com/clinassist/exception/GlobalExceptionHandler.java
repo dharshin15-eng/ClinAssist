@@ -28,6 +28,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(ClinicalRecordNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleClinicalRecordNotFound(ClinicalRecordNotFoundException ex, HttpServletRequest request) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
     @ExceptionHandler(DuplicatePatientIdException.class)
     public ResponseEntity<ErrorResponseDto> handleDuplicatePatientId(DuplicatePatientIdException ex, HttpServletRequest request) {
         ErrorResponseDto error = new ErrorResponseDto(
