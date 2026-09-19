@@ -39,6 +39,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(GeminiServiceException.class)
+    public ResponseEntity<ErrorResponseDto> handleGeminiService(GeminiServiceException ex, HttpServletRequest request) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Service Unavailable",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+
     @ExceptionHandler(DuplicatePatientIdException.class)
     public ResponseEntity<ErrorResponseDto> handleDuplicatePatientId(DuplicatePatientIdException ex, HttpServletRequest request) {
         ErrorResponseDto error = new ErrorResponseDto(
