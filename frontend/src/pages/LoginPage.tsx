@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import type { Role } from '../types';
+import { ApiClientError } from '../services/apiClient';
 import { 
   Activity, 
   Lock, 
@@ -21,7 +22,6 @@ export const LoginPage: React.FC = () => {
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<Role>('DOCTOR');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -31,10 +31,9 @@ export const LoginPage: React.FC = () => {
       return false;
     }
     
-    // Simple RFC 5322 regex validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setErrorMessage('Please enter a valid email address (e.g. doctor@hospital.com).');
+      setErrorMessage('Please enter a valid email address format (e.g. doctor@hospital.com).');
       return false;
     }
 
@@ -52,14 +51,20 @@ export const LoginPage: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      await login(email, selectedRole);
+      await login({ email: email.trim(), password });
+      setErrorMessage(null);
     } catch (err) {
-      setErrorMessage('Authentication failed. Please check credentials.');
+      if (err instanceof ApiClientError) {
+        setErrorMessage(err.message);
+      } else if (err instanceof Error) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage('Authentication failed. Please check credentials.');
+      }
     }
   };
 
   const fillDemoCredentials = (role: Role) => {
-    setSelectedRole(role);
     setErrorMessage(null);
     if (role === 'DOCTOR') {
       setEmail('doctor@hospital.com');
@@ -105,7 +110,7 @@ export const LoginPage: React.FC = () => {
               ClinAssist Portal
             </h1>
             <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              AI-Powered Healthcare Decision-Support System
+              AI-Powered Healthcare Decision-Support Platform
             </p>
           </div>
         </div>
@@ -113,7 +118,7 @@ export const LoginPage: React.FC = () => {
         {/* Login Card */}
         <div className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
-          {/* Validation Alert Box */}
+          {/* Backend Connection Error Alert */}
           {errorMessage && (
             <div style={{
               padding: '12px 16px',
@@ -123,10 +128,11 @@ export const LoginPage: React.FC = () => {
               color: 'var(--rose)',
               fontSize: '13px',
               display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
+              alignItems: 'flex-start',
+              gap: '10px',
+              lineHeight: '1.4'
             }} className="animate-fade-in">
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -228,33 +234,7 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Application Role Selection Selector */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
-                Application Role
-              </label>
-              <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value as Role)}
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(11, 15, 25, 0.8)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-main)',
-                  fontSize: '14px',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="DOCTOR" style={{ background: '#0b0f19' }}>DOCTOR (Clinical Decision Support)</option>
-                <option value="HOSPITAL_STAFF" style={{ background: '#0b0f19' }}>HOSPITAL_STAFF (Records Management)</option>
-                <option value="ADMIN" style={{ background: '#0b0f19' }}>ADMIN (System Administration)</option>
-              </select>
-            </div>
-
-            {/* Login Submit Button with Loading State */}
+            {/* Real Backend Authentication Login Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -281,7 +261,7 @@ export const LoginPage: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 size={18} className="animate-pulse-slow" />
-                  <span>Authenticating...</span>
+                  <span>Connecting to Backend Auth...</span>
                 </>
               ) : (
                 <>
@@ -292,7 +272,7 @@ export const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          {/* Quick Demo Credentials Pre-fill Buttons */}
+          {/* Quick Pre-fill Demo Inputs */}
           <div style={{
             paddingTop: '16px',
             borderTop: '1px solid var(--border-color)',
@@ -301,7 +281,7 @@ export const LoginPage: React.FC = () => {
             gap: '10px'
           }}>
             <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-subtle)' }}>
-              Quick Fill Demo Credentials
+              Fill Example Credentials
             </span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               <button

@@ -1,50 +1,99 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import type { User, Role } from '../types';
+import { authService } from '../services/authService';
+import type { LoginRequestDto, AuthResponseDto } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, role: Role) => Promise<void>;
+  login: (credentials: LoginRequestDto) => Promise<AuthResponseDto>;
   logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const TOKEN_KEY = 'clinassist_token';
+const USER_KEY = 'clinassist_user';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem(USER_KEY);
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem(TOKEN_KEY);
+  });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const login = async (email: string, role: Role): Promise<void> => {
+  // Optional background verification of stored token on mount
+  useEffect(() => {
+    const verifyStoredAuth = async () => {
+      if (token && user) {
+        try {
+          // Attempt token verification with /api/auth/me
+          const currentProfile = await authService.getCurrentUser();
+          const updatedUser: User = {
+            id: currentProfile.id,
+            email: currentProfile.email,
+            fullName: currentProfile.fullName,
+            role: currentProfile.role as Role
+          };
+          setUser(updatedUser);
+          localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+        } catch {
+          // If token verification fails (e.g. expired or invalid), clear stored state
+          logout();
+        }
+      }
+    };
+
+    verifyStoredAuth();
+  }, []);
+
+  const login = async (credentials: LoginRequestDto): Promise<AuthResponseDto> => {
     setIsLoading(true);
-    // Simulate minor network latency for UI loading state testing in Step 2
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const authResponse = await authService.login(credentials);
 
-    const mockNameMap: Record<Role, string> = {
-      DOCTOR: 'Dr. Alex Vance',
-      HOSPITAL_STAFF: 'Sarah Jenkins (Nurse Specialist)',
-      ADMIN: 'System Administrator'
-    };
+      const authenticatedUser: User = {
+        id: authResponse.id,
+        email: authResponse.email,
+        fullName: authResponse.fullName,
+        role: authResponse.role
+      };
 
-    const mockUser: User = {
-      id: `usr-${Date.now()}`,
-      email,
-      fullName: mockNameMap[role] || 'ClinAssist User',
-      role
-    };
+      setToken(authResponse.token);
+      setUser(authenticatedUser);
 
-    setUser(mockUser);
-    setIsLoading(false);
+      localStorage.setItem(TOKEN_KEY, authResponse.token);
+      localStorage.setItem(USER_KEY, JSON.stringify(authenticatedUser));
+
+      return authResponse;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      isAuthenticated: !!user,
+      token,
+      isAuthenticated: !!token && !!user,
       isLoading,
       login,
       logout
