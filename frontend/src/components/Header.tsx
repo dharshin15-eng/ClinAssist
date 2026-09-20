@@ -1,7 +1,10 @@
 import React from 'react';
-import { Activity, ShieldCheck, Cpu, User } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { Activity, ShieldCheck, Cpu, LogOut } from 'lucide-react';
 
 export const Header: React.FC = () => {
+  const { user, logout } = useAuth();
+
   return (
     <header style={{
       height: '68px',
@@ -77,40 +80,52 @@ export const Header: React.FC = () => {
           fontWeight: 600
         }}>
           <Cpu size={14} color="#a5b4fc" />
-          Frontend Foundation (Vite + React + TS)
+          Frontend Auth UI (Vite + React + TS)
         </div>
       </div>
 
-      {/* User Role Badge Placeholder */}
+      {/* User Role Badge & Logout */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 12px',
-          borderRadius: '8px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid var(--border-color)',
-          fontSize: '13px',
-          color: 'var(--text-main)'
-        }}>
-          <ShieldCheck size={16} color="var(--cyan)" />
-          <span style={{ fontWeight: 600 }}>DOCTOR</span>
-          <span style={{ color: 'var(--text-subtle)' }}>(Dr. Alex Vance)</span>
-        </div>
-        <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          background: 'var(--primary-light)',
-          border: '1px solid var(--border-accent)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--primary)'
-        }}>
-          <User size={18} />
-        </div>
+        {user && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid var(--border-color)',
+            fontSize: '13px',
+            color: 'var(--text-main)'
+          }}>
+            <ShieldCheck size={16} color="var(--cyan)" />
+            <span style={{ fontWeight: 600 }}>{user.role}</span>
+            <span style={{ color: 'var(--text-subtle)' }}>({user.fullName})</span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={logout}
+          title="Sign Out"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 12px',
+            borderRadius: 'var(--radius-sm)',
+            background: 'var(--rose-light)',
+            border: '1px solid rgba(244, 63, 94, 0.3)',
+            color: 'var(--rose)',
+            fontSize: '12px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <LogOut size={14} />
+          <span>Sign Out</span>
+        </button>
       </div>
     </header>
   );
