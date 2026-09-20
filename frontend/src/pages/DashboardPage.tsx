@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import type { Patient } from '../types';
+import { patientService } from '../services/patientService';
 import { StatCard } from '../components/StatCard';
-import { StatusBadge } from '../components/StatusBadge';
 import { SectionCard } from '../components/SectionCard';
-import { MOCK_PATIENTS, MOCK_ASSESSMENTS } from '../data/mockData';
 import { 
   Users, 
   BrainCircuit, 
@@ -13,7 +13,8 @@ import {
   ShieldAlert,
   ChevronRight,
   UserCheck,
-  Stethoscope
+  Stethoscope,
+  Loader2
 } from 'lucide-react';
 
 interface DashboardPageProps {
@@ -24,14 +25,32 @@ interface DashboardPageProps {
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   onNavigateToPatients,
-  onSelectPatient,
-  onSelectAssessment
+  onSelectPatient
 }) => {
   const { user } = useAuth();
 
-  const totalPatients = MOCK_PATIENTS.length;
-  const recentAssessmentList = MOCK_ASSESSMENTS['6aaecb6773a3c416fa03cf9a'] || [];
-  const primaryPatient = MOCK_PATIENTS[0];
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [isLoadingPatients, setIsLoadingPatients] = useState<boolean>(true);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setIsLoadingPatients(true);
+      try {
+        const patientData = await patientService.getPatients();
+        setPatients(patientData);
+      } catch (e) {
+        // Fallback gracefully on dashboard if backend error
+        setPatients([]);
+      } finally {
+        setIsLoadingPatients(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  const totalPatients = patients.length;
+  const recentPatients = patients.slice(0, 5);
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -93,7 +112,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           }}
         >
           <Users size={16} />
-          <span>View All Patients ({totalPatients})</span>
+          <span>View Patients ({totalPatients})</span>
           <ArrowRight size={16} />
         </button>
       </div>
@@ -106,39 +125,39 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       }}>
         <StatCard
           title="Total Registered Patients"
-          value={totalPatients}
-          subtitle="Managed in clinical database"
+          value={isLoadingPatients ? '...' : totalPatients}
+          subtitle="Managed in MongoDB database"
           icon={Users}
           color="var(--emerald)"
           bgColor="var(--emerald-light)"
         />
         <StatCard
           title="Clinical Assessments"
-          value="1 Active"
-          subtitle="Evaluated by 5 Decision Rules"
+          value="Decision Engine"
+          subtitle="Evaluates 5 Deterministic Rules"
           icon={BrainCircuit}
           color="var(--amber)"
           bgColor="var(--amber-light)"
         />
         <StatCard
           title="Diagnostic Reports"
-          value="2 Completed"
-          subtitle="CBC & Chest X-Ray reviewed"
+          value="Laboratory Data"
+          subtitle="Reports & Diagnostic Records"
           icon={FileText}
           color="var(--primary)"
           bgColor="var(--primary-light)"
         />
         <StatCard
           title="AI Summaries Generated"
-          value="1 Ready"
-          subtitle="Gemini AI assistance layer"
+          value="Gemini Layer"
+          subtitle="Clinical AI decision support"
           icon={Sparkles}
           color="var(--cyan)"
           bgColor="var(--cyan-light)"
         />
       </div>
 
-      {/* Main Grid: Recent Patients & Recent Assessments */}
+      {/* Main Grid: Recent Patients & System Information */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
@@ -172,160 +191,126 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </button>
           }
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {MOCK_PATIENTS.map((p) => (
-              <div
-                key={p.id}
-                onClick={() => onSelectPatient(p.id)}
-                style={{
-                  padding: '14px 18px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(11, 15, 25, 0.6)',
-                  border: '1px solid var(--border-color)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-accent)'}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '50%',
-                    background: 'var(--primary-light)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--primary)',
-                    fontWeight: 700,
-                    fontSize: '14px'
-                  }}>
-                    {p.fullName.charAt(0)}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
-                      {p.fullName}
-                    </div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                      {p.patientId} • DOB: {p.dateOfBirth} ({p.gender})
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    padding: '2px 8px',
-                    borderRadius: '6px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    color: 'var(--text-muted)',
-                    border: '1px solid var(--border-color)'
-                  }}>
-                    Blood: {p.bloodGroup}
-                  </span>
-                  <ChevronRight size={18} color="var(--text-subtle)" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-
-        {/* Recent Assessments Section */}
-        <SectionCard
-          title="Recent Decision-Support Assessments"
-          subtitle="Evaluated using deterministic rules & Gemini AI"
-          icon={Stethoscope}
-          iconColor="var(--amber)"
-        >
-          {recentAssessmentList.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {recentAssessmentList.map((assess) => (
+          {isLoadingPatients ? (
+            <div style={{ padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--text-muted)' }}>
+              <Loader2 size={20} className="animate-pulse-slow" />
+              <span>Loading recent patients...</span>
+            </div>
+          ) : recentPatients.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {recentPatients.map((p) => (
                 <div
-                  key={assess.id}
-                  onClick={() => onSelectAssessment(primaryPatient.id, assess.id)}
+                  key={p.id}
+                  onClick={() => onSelectPatient(p.id)}
                   style={{
-                    padding: '18px',
+                    padding: '14px 18px',
                     borderRadius: 'var(--radius-sm)',
                     background: 'rgba(11, 15, 25, 0.6)',
-                    border: '1px solid var(--border-accent)',
+                    border: '1px solid var(--border-color)',
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    cursor: 'pointer'
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
                   }}
+                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-accent)'}
+                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <BrainCircuit size={18} color="var(--amber)" />
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
-                        Assessment #{assess.id}
-                      </span>
-                    </div>
-                    <StatusBadge status={assess.status} />
-                  </div>
-
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    Patient: <strong>{primaryPatient.fullName}</strong> ({primaryPatient.patientId}) • Created by: {assess.createdBy}
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <span style={{
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      background: 'var(--amber-light)',
-                      color: 'var(--amber)',
-                      border: '1px solid rgba(245, 158, 11, 0.3)'
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '50%',
+                      background: 'var(--primary-light)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--primary)',
+                      fontWeight: 700,
+                      fontSize: '14px'
                     }}>
-                      5 Rule Engine Findings
-                    </span>
+                      {p.fullName.charAt(0)}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
+                        {p.fullName}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        {p.patientId || 'PAT-RECORD'} • DOB: {p.dateOfBirth} ({p.gender})
+                      </div>
+                    </div>
+                  </div>
 
-                    {assess.aiSummary && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {p.bloodGroup && (
                       <span style={{
                         fontSize: '11px',
                         fontWeight: 600,
-                        padding: '3px 8px',
+                        padding: '2px 8px',
                         borderRadius: '6px',
-                        background: 'var(--cyan-light)',
-                        color: 'var(--cyan)',
-                        border: '1px solid rgba(6, 182, 212, 0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: 'var(--text-muted)',
+                        border: '1px solid var(--border-color)'
                       }}>
-                        <Sparkles size={12} />
-                        AI Summary Generated
+                        Blood: {p.bloodGroup}
                       </span>
                     )}
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    gap: '4px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    color: 'var(--primary)',
-                    marginTop: '4px'
-                  }}>
-                    <span>Review Assessment Findings</span>
-                    <ArrowRight size={14} />
+                    <ChevronRight size={18} color="var(--text-subtle)" />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-              No recent assessments available.
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+              No patient records registered yet. Click &quot;View Patients&quot; to register a patient.
             </div>
           )}
+        </SectionCard>
+
+        {/* System Capabilities Section */}
+        <SectionCard
+          title="ClinAssist Decision Support Engine"
+          subtitle="Architecture and clinical workflow"
+          icon={Stethoscope}
+          iconColor="var(--amber)"
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{
+              padding: '16px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(11, 15, 25, 0.6)',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--emerald)', fontWeight: 600, fontSize: '14px' }}>
+                <Users size={16} />
+                <span>Patient Record Management</span>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+                Full CRUD management for patient demographics with auto-generated collision-safe PAT-XXXX business identifiers stored in MongoDB Atlas.
+              </p>
+            </div>
+
+            <div style={{
+              padding: '16px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(11, 15, 25, 0.6)',
+              border: '1px solid var(--border-color)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--amber)', fontWeight: 600, fontSize: '14px' }}>
+                <BrainCircuit size={16} />
+                <span>Deterministic Rule Evaluation</span>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+                Evaluates fever duration, medical history risk factors, drug allergy cross-reactivity, and medication contraindications safely.
+              </p>
+            </div>
+          </div>
         </SectionCard>
 
       </div>
