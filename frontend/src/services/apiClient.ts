@@ -166,6 +166,33 @@ export const apiClient = {
       }
       throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
     }
+  },
+
+  async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+    const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+    const token = getStoredToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw await parseErrorResponse(response);
+      }
+
+      return await response.json() as T;
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        throw err;
+      }
+      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+    }
   }
 };
 

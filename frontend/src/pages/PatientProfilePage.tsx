@@ -56,7 +56,10 @@ import {
   Plus,
   RotateCcw,
   FileCheck,
-  Sparkles
+  Sparkles,
+  Paperclip,
+  Eye,
+  Download
 } from 'lucide-react';
 
 interface PatientProfilePageProps {
@@ -149,6 +152,9 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
   const [repStatus, setRepStatus] = useState<ReportStatus>('COMPLETED');
   const [repSummary, setRepSummary] = useState<string>('');
   const [repReference, setRepReference] = useState<string>('');
+  const [selectedReportFile, setSelectedReportFile] = useState<File | null>(null);
+  const [currentExistingFileName, setCurrentExistingFileName] = useState<string | null>(null);
+  const [previewModalFile, setPreviewModalFile] = useState<{ url: string; name: string; type: string } | null>(null);
 
   // Independent Section Fetchers
   const fetchSymptoms = async () => {
@@ -402,6 +408,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
 
   const openReportModal = (report?: DiagnosticReport) => {
     setRecordModalError(null);
+    setSelectedReportFile(null);
     if (report) {
       setModalMode('EDIT');
       setSelectedRecordId(report.id);
@@ -412,6 +419,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       setRepStatus(report.status);
       setRepSummary(report.summary || '');
       setRepReference(report.reportReference || '');
+      setCurrentExistingFileName(report.fileName || null);
     } else {
       setModalMode('CREATE');
       setSelectedRecordId(null);
@@ -422,6 +430,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       setRepStatus('COMPLETED');
       setRepSummary('');
       setRepReference('');
+      setCurrentExistingFileName(null);
     }
     setActiveModal('REPORT');
   };
@@ -558,13 +567,25 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
         summary: repSummary.trim() || undefined,
         reportReference: repReference.trim() || undefined
       };
+
+      let savedReport: DiagnosticReport;
       if (modalMode === 'CREATE') {
-        await diagnosticReportService.createReport(patientId, payload);
-        setSuccessToast(`Diagnostic report "${payload.reportName}" uploaded.`);
-      } else if (selectedRecordId) {
-        await diagnosticReportService.updateReport(patientId, selectedRecordId, payload);
-        setSuccessToast(`Diagnostic report "${payload.reportName}" updated.`);
+        savedReport = await diagnosticReportService.createReport(patientId, payload);
+      } else {
+        savedReport = await diagnosticReportService.updateReport(patientId, selectedRecordId!, payload);
       }
+
+      if (selectedReportFile) {
+        try {
+          await diagnosticReportService.uploadReportFile(patientId, savedReport.id, selectedReportFile);
+          setSuccessToast(`Diagnostic report "${savedReport.reportName}" and attached file saved.`);
+        } catch (fileErr) {
+          setSuccessToast(`Diagnostic report was saved, but the file upload failed. Please try uploading the file again.`);
+        }
+      } else {
+        setSuccessToast(`Diagnostic report "${savedReport.reportName}" saved.`);
+      }
+
       setTimeout(() => setSuccessToast(null), 4000);
       closeModal();
       await fetchReports();
@@ -572,6 +593,38 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       setRecordModalError(err instanceof ApiClientError ? err.message : 'Failed to save diagnostic report.');
     } finally {
       setIsSubmittingRecord(false);
+    }
+  };
+
+  const handleViewFile = async (report: DiagnosticReport) => {
+    try {
+      const blob = await diagnosticReportService.fetchReportFileBlob(patientId, report.id);
+      const url = URL.createObjectURL(blob);
+      setPreviewModalFile({
+        url,
+        name: report.fileName || report.reportName,
+        type: report.fileContentType || blob.type
+      });
+    } catch (err) {
+      setSuccessToast("Unable to open the diagnostic report file.");
+      setTimeout(() => setSuccessToast(null), 4000);
+    }
+  };
+
+  const handleDownloadFile = async (report: DiagnosticReport) => {
+    try {
+      const blob = await diagnosticReportService.fetchReportFileBlob(patientId, report.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = report.fileName || `${report.reportName.replace(/\s+/g, '_')}.file`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setSuccessToast("Unable to download the diagnostic report file.");
+      setTimeout(() => setSuccessToast(null), 4000);
     }
   };
 
@@ -975,6 +1028,46 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                       <strong>Summary:</strong> {r.summary}
                     </div>
                   )}
+
+                  {r.fileName && (
+                    <div style={{
+                      padding: '10px 14px',
+                      borderRadius: '6px',
+                      background: 'rgba(99, 102, 241, 0.08)',
+                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '10px',
+                      fontSize: '13px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a5b4fc' }}>
+                        <Paperclip size={16} />
+                        <span style={{ fontWeight: 600 }}>{r.fileName}</span>
+                        {r.fileSize && <span style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>({formatFileSize(r.fileSize)})</span>}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleViewFile(r)}
+                          style={{ padding: '4px 10px', borderRadius: '4px', background: 'var(--primary-light)', border: '1px solid var(--border-accent)', color: '#a5b4fc', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <Eye size={12} />
+                          <span>View Report</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadFile(r)}
+                          style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <Download size={12} />
+                          <span>Download</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1283,6 +1376,27 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                   />
                 </div>
 
+                <div style={fieldGroupStyle}>
+                  <label style={labelStyle}>Report Document File (.pdf, .png, .jpg)</label>
+                  {currentExistingFileName && (
+                    <div style={{ fontSize: '12px', color: '#a5b4fc', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Paperclip size={14} />
+                      <span>Current attached file: <strong>{currentExistingFileName}</strong></span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
+                    onChange={e => setSelectedReportFile(e.target.files?.[0] || null)}
+                    style={inputStyle}
+                  />
+                  {selectedReportFile && (
+                    <div style={{ fontSize: '12px', color: 'var(--emerald)', marginTop: '4px' }}>
+                      Selected for upload: <strong>{selectedReportFile.name}</strong> ({formatFileSize(selectedReportFile.size)})
+                    </div>
+                  )}
+                </div>
+
                 <ModalButtons isSubmitting={isSubmittingRecord} onCancel={closeModal} submitText={modalMode === 'CREATE' ? 'Upload Diagnostic Report' : 'Update Diagnostic Report'} />
               </form>
             )}
@@ -1365,11 +1479,53 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
         </div>
       )}
 
+      {/* FILE PREVIEW MODAL */}
+      {previewModalFile && (
+        <div style={modalOverlayStyle} className="animate-fade-in">
+          <div className="glass-panel" style={{ ...modalBoxStyle, maxWidth: '800px', width: '90vw', height: '80vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <FileText size={20} color="var(--primary)" />
+                <span style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>{previewModalFile.name}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  URL.revokeObjectURL(previewModalFile.url);
+                  setPreviewModalFile(null);
+                }}
+                style={btnIconStyle}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ flex: 1, overflow: 'hidden', marginTop: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {previewModalFile.type.includes('image') ? (
+                <img src={previewModalFile.url} alt={previewModalFile.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              ) : previewModalFile.type.includes('pdf') ? (
+                <iframe src={previewModalFile.url} title={previewModalFile.name} style={{ width: '100%', height: '100%', border: 'none' }} />
+              ) : (
+                <div style={{ color: 'var(--text-muted)', textAlign: 'center' }}>
+                  <span>Preview not directly supported in viewer. Please download to view.</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
 
 // Reusable Helper Components & Styles
+const formatFileSize = (bytes?: number): string => {
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
 const ModalButtons: React.FC<{ isSubmitting: boolean; onCancel: () => void; submitText: string }> = ({ isSubmitting, onCancel, submitText }) => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
     <button type="button" onClick={onCancel} disabled={isSubmitting} style={btnCancelStyle}>Cancel</button>

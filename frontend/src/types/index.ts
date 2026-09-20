@@ -75,6 +75,12 @@ export interface DiagnosticReport {
   status: ReportStatus;
   summary?: string;
   reportReference?: string;
+  fileId?: string;
+  fileName?: string;
+  fileContentType?: string;
+  fileSize?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type AssessmentStatus = 'DRAFT' | 'COMPLETED' | 'REVIEWED';

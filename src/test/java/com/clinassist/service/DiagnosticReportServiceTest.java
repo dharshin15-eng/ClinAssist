@@ -5,7 +5,7 @@ import com.clinassist.dto.DiagnosticReportResponseDto;
 import com.clinassist.entity.DiagnosticReport;
 import com.clinassist.entity.ReportStatus;
 import com.clinassist.entity.ReportType;
-import com.clinassist.exception.ClinicalRecordNotFoundException;
+import com.clinassist.exception.DiagnosticReportNotFoundException;
 import com.clinassist.exception.PatientNotFoundException;
 import com.clinassist.repository.DiagnosticReportRepository;
 import com.clinassist.repository.PatientRepository;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,11 +34,14 @@ class DiagnosticReportServiceTest {
     @Mock
     private PatientRepository patientRepository;
 
+    @Mock
+    private GridFsTemplate gridFsTemplate;
+
     private DiagnosticReportService reportService;
 
     @BeforeEach
     void setUp() {
-        reportService = new DiagnosticReportService(reportRepository, patientRepository);
+        reportService = new DiagnosticReportService(reportRepository, patientRepository, gridFsTemplate);
     }
 
     @Test
@@ -105,7 +109,7 @@ class DiagnosticReportServiceTest {
         when(patientRepository.existsById("patient-B")).thenReturn(true);
         when(reportRepository.findByIdAndPatientId("report-A", "patient-B")).thenReturn(Optional.empty());
 
-        assertThrows(ClinicalRecordNotFoundException.class, () -> reportService.getReportById("patient-B", "report-A"));
+        assertThrows(DiagnosticReportNotFoundException.class, () -> reportService.getReportById("patient-B", "report-A"));
     }
 
     @Test

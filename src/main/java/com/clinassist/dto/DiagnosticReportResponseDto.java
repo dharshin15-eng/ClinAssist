@@ -20,6 +20,10 @@ public class DiagnosticReportResponseDto {
     private ReportStatus status;
     private String summary;
     private String reportReference;
+    private String fileId;
+    private String fileName;
+    private String fileContentType;
+    private Long fileSize;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -38,6 +42,27 @@ public class DiagnosticReportResponseDto {
         this.status = status;
         this.summary = summary;
         this.reportReference = reportReference;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public DiagnosticReportResponseDto(String id, String patientId, String reportName, ReportType reportType,
+                                       LocalDate testDate, String labName, ReportStatus status, String summary,
+                                       String reportReference, String fileId, String fileName, String fileContentType,
+                                       Long fileSize, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.patientId = patientId;
+        this.reportName = reportName;
+        this.reportType = reportType;
+        this.testDate = testDate;
+        this.labName = labName;
+        this.status = status;
+        this.summary = summary;
+        this.reportReference = reportReference;
+        this.fileId = fileId;
+        this.fileName = fileName;
+        this.fileContentType = fileContentType;
+        this.fileSize = fileSize;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -112,6 +137,38 @@ public class DiagnosticReportResponseDto {
 
     public void setReportReference(String reportReference) {
         this.reportReference = reportReference;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileContentType() {
+        return fileContentType;
+    }
+
+    public void setFileContentType(String fileContentType) {
+        this.fileContentType = fileContentType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
     }
 
     public LocalDateTime getCreatedAt() {

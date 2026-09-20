@@ -26,6 +26,10 @@ public class DiagnosticReport {
     private ReportStatus status;
     private String summary;
     private String reportReference;
+    private String fileId;
+    private String fileName;
+    private String fileContentType;
+    private Long fileSize;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -132,6 +136,38 @@ public class DiagnosticReport {
 
     public void setReportReference(String reportReference) {
         this.reportReference = reportReference;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileContentType() {
+        return fileContentType;
+    }
+
+    public void setFileContentType(String fileContentType) {
+        this.fileContentType = fileContentType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
     }
 
     public LocalDateTime getCreatedAt() {
