@@ -2,22 +2,21 @@ import React from 'react';
 import { 
   LayoutDashboard, 
   Users, 
-  Stethoscope, 
-  FileText, 
   BrainCircuit, 
-  Sparkles,
   Settings,
   HelpCircle
 } from 'lucide-react';
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  activeView: string;
+  onNavigate: (view: 'dashboard' | 'patients' | 'assessment') => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate }) => {
   const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, active: true },
-    { label: 'Patient Records', icon: Users, badge: 'Phase 4' },
-    { label: 'Symptoms & History', icon: Stethoscope, badge: 'Phase 5' },
-    { label: 'Diagnostic Reports', icon: FileText, badge: 'Phase 6' },
-    { label: 'Rule Engine', icon: BrainCircuit, badge: 'Phase 7' },
-    { label: 'Gemini AI Assistant', icon: Sparkles, badge: 'Phase 7' },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'patients', label: 'Patient Directory', icon: Users, badge: 'Phase 4-6' },
+    { id: 'assessment', label: 'Decision Engine', icon: BrainCircuit, badge: 'Phase 7' }
   ];
 
   return (
@@ -40,31 +39,34 @@ export const Sidebar: React.FC = () => {
           letterSpacing: '1px',
           color: 'var(--text-subtle)'
         }}>
-          Clinical Modules
+          Clinical Navigation
         </div>
 
-        {navItems.map((item, index) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
+          const isActive = activeView === item.id || (activeView === 'patient-profile' && item.id === 'patients');
+
           return (
             <div
-              key={index}
+              key={item.id}
+              onClick={() => onNavigate(item.id as any)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '10px 14px',
+                padding: '11px 14px',
                 borderRadius: 'var(--radius-sm)',
-                background: item.active ? 'var(--primary-light)' : 'transparent',
-                color: item.active ? '#ffffff' : 'var(--text-muted)',
-                border: item.active ? '1px solid var(--border-accent)' : '1px solid transparent',
+                background: isActive ? 'var(--primary-light)' : 'transparent',
+                color: isActive ? '#ffffff' : 'var(--text-muted)',
+                border: isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
                 cursor: 'pointer',
-                fontWeight: item.active ? 600 : 400,
+                fontWeight: isActive ? 600 : 400,
                 fontSize: '14px',
                 transition: 'all 0.2s ease'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Icon size={18} color={item.active ? 'var(--primary)' : 'var(--text-subtle)'} />
+                <Icon size={18} color={isActive ? 'var(--primary)' : 'var(--text-subtle)'} />
                 <span>{item.label}</span>
               </div>
               {item.badge && (
@@ -85,7 +87,7 @@ export const Sidebar: React.FC = () => {
         })}
       </div>
 
-      {/* Footer info */}
+      {/* Footer Info */}
       <div style={{
         padding: '16px',
         borderRadius: 'var(--radius-md)',
@@ -97,7 +99,7 @@ export const Sidebar: React.FC = () => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
           <Settings size={14} />
-          <span>System Status: Online</span>
+          <span>Dev Engine: Active</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
           <HelpCircle size={14} />

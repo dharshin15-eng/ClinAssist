@@ -3,16 +3,18 @@ import { Header } from '../components/Header';
 import { Sidebar } from '../components/Sidebar';
 
 interface MainLayoutProps {
+  activeView: string;
+  onNavigate: (view: 'dashboard' | 'patients' | 'assessment') => void;
   children: React.ReactNode;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+export const MainLayout: React.FC<MainLayoutProps> = ({ activeView, onNavigate, children }) => {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div className="bg-gradient-mesh" />
       <Header />
       <div style={{ display: 'flex', flex: 1 }}>
-        <Sidebar />
+        <Sidebar activeView={activeView} onNavigate={onNavigate} />
         <main style={{
           flex: 1,
           padding: '32px 36px',
