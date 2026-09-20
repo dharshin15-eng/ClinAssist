@@ -7,11 +7,12 @@ import { DashboardPage } from './pages/DashboardPage';
 import { PatientsPage } from './pages/PatientsPage';
 import { PatientProfilePage } from './pages/PatientProfilePage';
 import { AssessmentPage } from './pages/AssessmentPage';
+import { AdminUsersPage } from './pages/AdminUsersPage';
 
-type ViewMode = 'dashboard' | 'patients' | 'patient-profile' | 'assessment';
+type ViewMode = 'dashboard' | 'patients' | 'patient-profile' | 'assessment' | 'admin-users';
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [activeView, setActiveView] = useState<ViewMode>('dashboard');
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
@@ -32,7 +33,7 @@ const AppContent: React.FC = () => {
     setActiveView('assessment');
   };
 
-  const handleNavigateSidebar = (view: 'dashboard' | 'patients' | 'assessment') => {
+  const handleNavigateSidebar = (view: 'dashboard' | 'patients' | 'assessment' | 'admin-users') => {
     setActiveView(view);
   };
 
@@ -65,6 +66,10 @@ const AppContent: React.FC = () => {
           onBack={() => setActiveView('patient-profile')}
           onNavigateToPatients={() => setActiveView('patients')}
         />
+      )}
+
+      {activeView === 'admin-users' && user?.role === 'ADMIN' && (
+        <AdminUsersPage />
       )}
     </MainLayout>
   );

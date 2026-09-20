@@ -1,9 +1,7 @@
 package com.clinassist.controller;
 
-import com.clinassist.dto.AuthResponseDto;
 import com.clinassist.dto.LoginRequestDto;
 import com.clinassist.dto.RegisterRequestDto;
-import com.clinassist.dto.UserResponseDto;
 import com.clinassist.entity.Role;
 import com.clinassist.entity.User;
 import com.clinassist.repository.UserRepository;
@@ -15,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -50,7 +49,23 @@ class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void testRegisterDoctorSuccess() throws Exception {
+    void testUnauthenticatedRegisterForbidden() throws Exception {
+        RegisterRequestDto request = new RegisterRequestDto(
+                "doctor@hospital.com",
+                "Password123!",
+                "Dr. John Doe",
+                Role.DOCTOR
+        );
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testAdminRegisterDoctorSuccess() throws Exception {
         RegisterRequestDto request = new RegisterRequestDto(
                 "doctor@hospital.com",
                 "Password123!",
@@ -75,7 +90,8 @@ class AuthControllerTest {
     }
 
     @Test
-    void testRegisterHospitalStaffSuccess() throws Exception {
+    @WithMockUser(roles = "ADMIN")
+    void testAdminRegisterHospitalStaffSuccess() throws Exception {
         RegisterRequestDto request = new RegisterRequestDto(
                 "staff@hospital.com",
                 "StaffPassword123!",
@@ -100,6 +116,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void testRegisterAdminForbidden() throws Exception {
         RegisterRequestDto request = new RegisterRequestDto(
                 "fakeadmin@hospital.com",
@@ -116,6 +133,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void testRegisterDuplicateEmailFails() throws Exception {
         when(userRepository.existsByEmail("duplicate@hospital.com")).thenReturn(true);
 
@@ -136,6 +154,7 @@ class AuthControllerTest {
     @Test
     void testLoginSuccess() throws Exception {
         User user = new User("doc-1", "doctor.login@hospital.com", passwordEncoder.encode("ValidPassword123!"), "Dr. Alice", Role.DOCTOR, LocalDateTime.now(), LocalDateTime.now());
+        user.setEnabled(true);
         when(userRepository.findByEmail("doctor.login@hospital.com")).thenReturn(Optional.of(user));
 
         LoginRequestDto loginRequest = new LoginRequestDto("doctor.login@hospital.com", "ValidPassword123!");
@@ -152,6 +171,7 @@ class AuthControllerTest {
     @Test
     void testLoginInvalidPasswordUnauthorized() throws Exception {
         User user = new User("doc-2", "doctor.invalid@hospital.com", passwordEncoder.encode("ValidPassword123!"), "Dr. Bob", Role.DOCTOR, LocalDateTime.now(), LocalDateTime.now());
+        user.setEnabled(true);
         when(userRepository.findByEmail("doctor.invalid@hospital.com")).thenReturn(Optional.of(user));
 
         LoginRequestDto loginRequest = new LoginRequestDto("doctor.invalid@hospital.com", "WrongPassword!");
@@ -166,21 +186,15 @@ class AuthControllerTest {
     @Test
     void testGetCurrentUserWithTokenSuccess() throws Exception {
         User user = new User("doc-me", "me@hospital.com", passwordEncoder.encode("MySecret123!"), "Dr. Me", Role.DOCTOR, LocalDateTime.now(), LocalDateTime.now());
-        when(userRepository.existsByEmail("me@hospital.com")).thenReturn(false);
+        user.setEnabled(true);
         when(userRepository.findByEmail("me@hospital.com")).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        RegisterRequestDto request = new RegisterRequestDto(
-                "me@hospital.com",
-                "MySecret123!",
-                "Dr. Me",
-                Role.DOCTOR
-        );
+        LoginRequestDto loginRequest = new LoginRequestDto("me@hospital.com", "MySecret123!");
 
-        MvcResult result = mockMvc.perform(post("/api/auth/register")
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();

@@ -4,20 +4,33 @@ import {
   Users, 
   BrainCircuit, 
   Settings,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck
 } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 interface SidebarProps {
   activeView: string;
-  onNavigate: (view: 'dashboard' | 'patients' | 'assessment') => void;
+  onNavigate: (view: 'dashboard' | 'patients' | 'assessment' | 'admin-users') => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate }) => {
+  const { user } = useAuth();
+
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'patients', label: 'Patient Directory', icon: Users, badge: 'Phase 4-6' },
     { id: 'assessment', label: 'Decision Engine', icon: BrainCircuit, badge: 'Phase 7' }
   ];
+
+  if (user?.role === 'ADMIN') {
+    navItems.push({
+      id: 'admin-users',
+      label: 'User Management',
+      icon: ShieldCheck,
+      badge: 'Admin'
+    });
+  }
 
   return (
     <aside style={{

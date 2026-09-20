@@ -6,7 +6,7 @@ import com.clinassist.entity.User;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object for user profile output.
+ * Data Transfer Object for user profile and administrative output.
  */
 public class UserResponseDto {
 
@@ -14,6 +14,7 @@ public class UserResponseDto {
     private String email;
     private String fullName;
     private Role role;
+    private boolean enabled;
     private LocalDateTime createdAt;
 
     public UserResponseDto() {
@@ -24,14 +25,16 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.fullName = user.getFullName();
         this.role = user.getRole();
+        this.enabled = user.isEnabled();
         this.createdAt = user.getCreatedAt();
     }
 
-    public UserResponseDto(String id, String email, String fullName, Role role, LocalDateTime createdAt) {
+    public UserResponseDto(String id, String email, String fullName, Role role, boolean enabled, LocalDateTime createdAt) {
         this.id = id;
         this.email = email;
         this.fullName = fullName;
         this.role = role;
+        this.enabled = enabled;
         this.createdAt = createdAt;
     }
 
@@ -65,6 +68,14 @@ public class UserResponseDto {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public LocalDateTime getCreatedAt() {

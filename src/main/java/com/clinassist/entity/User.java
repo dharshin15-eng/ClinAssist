@@ -21,6 +21,7 @@ public class User {
     private String password;
     private String fullName;
     private Role role;
+    private boolean enabled = true;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -32,6 +33,7 @@ public class User {
         this.password = password;
         this.fullName = fullName;
         this.role = role;
+        this.enabled = true;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -42,6 +44,18 @@ public class User {
         this.password = password;
         this.fullName = fullName;
         this.role = role;
+        this.enabled = true;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public User(String id, String email, String password, String fullName, Role role, boolean enabled, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.role = role;
+        this.enabled = enabled;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -84,6 +98,14 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public LocalDateTime getCreatedAt() {

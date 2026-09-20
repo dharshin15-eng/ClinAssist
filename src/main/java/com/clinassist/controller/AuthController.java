@@ -25,6 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterRequestDto dto) {
         AuthResponseDto response = authService.register(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

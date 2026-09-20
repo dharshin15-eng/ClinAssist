@@ -4,7 +4,7 @@ import { Sidebar } from '../components/Sidebar';
 
 interface MainLayoutProps {
   activeView: string;
-  onNavigate: (view: 'dashboard' | 'patients' | 'assessment') => void;
+  onNavigate: (view: 'dashboard' | 'patients' | 'assessment' | 'admin-users') => void;
   children: React.ReactNode;
 }
 

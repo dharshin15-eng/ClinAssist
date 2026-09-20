@@ -143,6 +143,28 @@ export const apiClient = {
     }
   },
 
+  async patch<T>(endpoint: string, body: any, customHeaders?: HeadersInit): Promise<T> {
+    const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+    try {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: getHeaders(customHeaders),
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        throw await parseErrorResponse(response);
+      }
+
+      return await response.json() as T;
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        throw err;
+      }
+      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+    }
+  },
+
   async delete<T>(endpoint: string, customHeaders?: HeadersInit): Promise<T> {
     const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
     try {

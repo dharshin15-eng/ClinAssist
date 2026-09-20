@@ -5,6 +5,32 @@ export interface User {
   email: string;
   fullName: string;
   role: Role;
+  enabled?: boolean;
+  createdAt?: string;
+}
+
+export interface AdminCreateUserRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  role: 'DOCTOR' | 'HOSPITAL_STAFF';
+}
+
+export interface UserStatusUpdateRequest {
+  enabled: boolean;
+}
+
+export interface AuditLog {
+  id: string;
+  actorUserId?: string;
+  actorEmail?: string;
+  actorRole?: string;
+  action: string;
+  targetUserId?: string;
+  targetResourceId?: string;
+  timestamp: string;
+  success: boolean;
+  details?: string;
 }
 
 export interface Patient {

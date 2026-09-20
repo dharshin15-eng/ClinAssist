@@ -58,6 +58,10 @@ public class AuthService {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
+        if (!user.isEnabled()) {
+            throw new org.springframework.security.authentication.DisabledException("User account is disabled");
+        }
+
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
