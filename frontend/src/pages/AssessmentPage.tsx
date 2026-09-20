@@ -21,6 +21,7 @@ import { ApiClientError } from '../services/apiClient';
 import { StatusBadge } from '../components/StatusBadge';
 import { SeverityBadge } from '../components/SeverityBadge';
 import { SectionCard } from '../components/SectionCard';
+import { GeminiSummaryViewer } from '../components/GeminiSummaryViewer';
 import { 
   ArrowLeft, 
   BrainCircuit, 
@@ -676,27 +677,7 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
                 <span style={{ fontSize: '13px', fontWeight: 600 }}>Synthesizing clinical findings via Gemini AI...</span>
               </div>
             ) : assessment.aiSummary ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{
-                  padding: '18px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(6, 182, 212, 0.05)',
-                  border: '1px solid rgba(6, 182, 212, 0.2)',
-                  whiteSpace: 'pre-wrap',
-                  fontSize: '13px',
-                  lineHeight: '1.6',
-                  color: 'var(--text-main)'
-                }}>
-                  {assessment.aiSummary}
-                </div>
-
-                <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-sm)', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <ShieldAlert size={16} color="var(--amber)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-                    <strong style={{ color: 'var(--amber)' }}>Doctor Responsibility Note:</strong> This AI summary is an assistant overview. It does not replace independent physician diagnosis, prescribing, or treatment decisions.
-                  </span>
-                </div>
-              </div>
+              <GeminiSummaryViewer summary={assessment.aiSummary} />
             ) : (
               <div style={{ padding: '36px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', color: 'var(--text-muted)' }}>
                 <Sparkles size={32} color="var(--cyan)" style={{ opacity: 0.6 }} />
