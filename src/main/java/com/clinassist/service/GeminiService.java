@@ -4,25 +4,33 @@ import com.clinassist.entity.*;
 import com.clinassist.exception.GeminiServiceException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
 /**
  * Service providing isolated integration with Google Gemini REST API.
+ * Includes bounded exponential backoff retries strictly for transient HTTP 503 UNAVAILABLE responses.
  */
 @Service
 public class GeminiService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GeminiService.class);
+    private static final int MAX_ATTEMPTS = 3;
 
     private final String apiKey;
     private final String apiUrl;
     private final String model;
     private final int timeoutMs;
+    private final long initialBackoffMs;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -32,28 +40,34 @@ public class GeminiService {
             @Value("${gemini.api-url:https://generativelanguage.googleapis.com/v1beta/models}") String apiUrl,
             @Value("${gemini.model:gemini-1.5-flash}") String model,
             @Value("${gemini.timeout-ms:10000}") int timeoutMs) {
-        this.apiKey = apiKey;
-        this.apiUrl = apiUrl;
-        this.model = model;
-        this.timeoutMs = timeoutMs;
-        this.objectMapper = new ObjectMapper();
-
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(timeoutMs);
-        factory.setReadTimeout(timeoutMs);
-        this.restTemplate = new RestTemplate(factory);
+        this(apiKey, apiUrl, model, timeoutMs, createRestTemplate(timeoutMs), 2000L);
     }
 
     /**
      * Package-private constructor for unit testing with custom RestTemplate.
      */
     GeminiService(String apiKey, String apiUrl, String model, int timeoutMs, RestTemplate restTemplate) {
+        this(apiKey, apiUrl, model, timeoutMs, restTemplate, 1L);
+    }
+
+    /**
+     * Package-private full constructor for unit testing with custom backoff delay.
+     */
+    GeminiService(String apiKey, String apiUrl, String model, int timeoutMs, RestTemplate restTemplate, long initialBackoffMs) {
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
         this.model = model;
         this.timeoutMs = timeoutMs;
+        this.initialBackoffMs = initialBackoffMs;
         this.objectMapper = new ObjectMapper();
         this.restTemplate = restTemplate;
+    }
+
+    private static RestTemplate createRestTemplate(int timeoutMs) {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(timeoutMs);
+        factory.setReadTimeout(timeoutMs);
+        return new RestTemplate(factory);
     }
 
     public String generateSummary(Patient patient,
@@ -69,28 +83,69 @@ public class GeminiService {
 
         String prompt = buildPrompt(patient, findings, symptoms, histories, allergies, medications, reports);
 
-        try {
-            String url = String.format("%s/%s:generateContent?key=%s", apiUrl, model, apiKey);
+        Map<String, Object> part = Map.of("text", prompt);
+        Map<String, Object> content = Map.of("parts", List.of(part));
+        Map<String, Object> requestBody = Map.of("contents", List.of(content));
 
-            Map<String, Object> part = Map.of("text", prompt);
-            Map<String, Object> content = Map.of("parts", List.of(part));
-            Map<String, Object> requestBody = Map.of("contents", List.of(content));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+        String url = String.format("%s/%s:generateContent?key=%s", apiUrl, model, apiKey);
 
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        long backoffMs = initialBackoffMs;
 
-            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                throw new GeminiServiceException("Gemini API returned non-2xx HTTP status: " + response.getStatusCode());
+        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            try {
+                ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+                if (response.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+                    if (attempt < MAX_ATTEMPTS) {
+                        logger.warn("Gemini API returned transient HTTP 503 Service Unavailable (attempt {} of {}). Retrying in {} ms...", attempt, MAX_ATTEMPTS, backoffMs);
+                        sleepBackoff(backoffMs);
+                        backoffMs *= 2;
+                        continue;
+                    } else {
+                        throw new GeminiServiceException("Gemini API service is temporarily unavailable (HTTP 503). Please try again later.");
+                    }
+                }
+
+                if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                    throw new GeminiServiceException("Gemini API returned non-2xx HTTP status: " + response.getStatusCode());
+                }
+
+                return extractTextFromResponse(response.getBody());
+
+            } catch (HttpStatusCodeException e) {
+                if (e.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
+                    if (attempt < MAX_ATTEMPTS) {
+                        logger.warn("Gemini API returned transient HTTP 503 Service Unavailable (attempt {} of {}). Retrying in {} ms...", attempt, MAX_ATTEMPTS, backoffMs);
+                        sleepBackoff(backoffMs);
+                        backoffMs *= 2;
+                        continue;
+                    } else {
+                        throw new GeminiServiceException("Gemini API service is temporarily unavailable (HTTP 503). Please try again later.", e);
+                    }
+                }
+                // Permanent errors (401, 403, 404, 400, 500) are NOT retried
+                throw new GeminiServiceException("Gemini API HTTP error (" + e.getStatusCode().value() + "): " + e.getStatusText(), e);
+
+            } catch (GeminiServiceException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new GeminiServiceException("Failed to call Gemini API: " + e.getMessage(), e);
             }
+        }
 
-            return extractTextFromResponse(response.getBody());
-        } catch (GeminiServiceException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new GeminiServiceException("Failed to call Gemini API: " + e.getMessage(), e);
+        throw new GeminiServiceException("Gemini API service is temporarily unavailable (HTTP 503). Please try again later.");
+    }
+
+    private void sleepBackoff(long ms) {
+        if (ms <= 0) return;
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
         }
     }
 
