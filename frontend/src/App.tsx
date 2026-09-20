@@ -7,7 +7,6 @@ import { DashboardPage } from './pages/DashboardPage';
 import { PatientsPage } from './pages/PatientsPage';
 import { PatientProfilePage } from './pages/PatientProfilePage';
 import { AssessmentPage } from './pages/AssessmentPage';
-import { MOCK_PATIENTS } from './data/mockData';
 
 type ViewMode = 'dashboard' | 'patients' | 'patient-profile' | 'assessment';
 
@@ -15,8 +14,8 @@ const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   const [activeView, setActiveView] = useState<ViewMode>('dashboard');
-  const [selectedPatientId, setSelectedPatientId] = useState<string>(MOCK_PATIENTS[0].id);
-  const [selectedAssessmentId, setSelectedAssessmentId] = useState<string>('assess-9001');
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedAssessmentId, setSelectedAssessmentId] = useState<string | null>(null);
 
   if (!isAuthenticated) {
     return <LoginPage />;
@@ -53,7 +52,7 @@ const AppContent: React.FC = () => {
 
       {activeView === 'patient-profile' && (
         <PatientProfilePage
-          patientId={selectedPatientId}
+          patientId={selectedPatientId || ''}
           onBack={() => setActiveView('patients')}
           onSelectAssessment={handleSelectAssessment}
         />
@@ -61,9 +60,10 @@ const AppContent: React.FC = () => {
 
       {activeView === 'assessment' && (
         <AssessmentPage
-          patientId={selectedPatientId}
-          assessmentId={selectedAssessmentId}
+          patientId={selectedPatientId || ''}
+          assessmentId={selectedAssessmentId || ''}
           onBack={() => setActiveView('patient-profile')}
+          onNavigateToPatients={() => setActiveView('patients')}
         />
       )}
     </MainLayout>
