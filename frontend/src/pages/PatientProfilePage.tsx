@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import type { Patient, Symptom, MedicalHistory, Allergy, Medication, SymptomSeverity, HistoryStatus } from '../types';
+import type { 
+  Patient, 
+  Symptom, 
+  MedicalHistory, 
+  Allergy, 
+  Medication, 
+  DiagnosticReport, 
+  Assessment,
+  SymptomSeverity, 
+  HistoryStatus,
+  ReportType,
+  ReportStatus 
+} from '../types';
 import { patientService } from '../services/patientService';
 import type { PatientRequestDto } from '../services/patientService';
 import { 
@@ -14,6 +26,9 @@ import type {
   AllergyRequestDto, 
   MedicationRequestDto 
 } from '../services/clinicalService';
+import { diagnosticReportService } from '../services/diagnosticReportService';
+import type { DiagnosticReportRequestDto } from '../services/diagnosticReportService';
+import { assessmentService } from '../services/assessmentService';
 import { ApiClientError } from '../services/apiClient';
 import { SectionCard } from '../components/SectionCard';
 import { StatusBadge } from '../components/StatusBadge';
@@ -39,7 +54,9 @@ import {
   X,
   CheckCircle2,
   Plus,
-  RotateCcw
+  RotateCcw,
+  FileCheck,
+  Sparkles
 } from 'lucide-react';
 
 interface PatientProfilePageProps {
@@ -56,7 +73,8 @@ interface SectionState<T> {
 
 export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
   patientId,
-  onBack
+  onBack,
+  onSelectAssessment
 }) => {
   const [patient, setPatient] = useState<Patient | null>(null);
   const [isLoadingPatient, setIsLoadingPatient] = useState<boolean>(true);
@@ -71,6 +89,10 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
   const [historyState, setHistoryState] = useState<SectionState<MedicalHistory>>({ data: [], loading: true, error: null });
   const [allergiesState, setAllergiesState] = useState<SectionState<Allergy>>({ data: [], loading: true, error: null });
   const [medicationsState, setMedicationsState] = useState<SectionState<Medication>>({ data: [], loading: true, error: null });
+  const [reportsState, setReportsState] = useState<SectionState<DiagnosticReport>>({ data: [], loading: true, error: null });
+  const [assessmentsState, setAssessmentsState] = useState<SectionState<Assessment>>({ data: [], loading: true, error: null });
+
+  const [isCreatingAssessment, setIsCreatingAssessment] = useState<boolean>(false);
 
   // Patient Edit & Delete Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -87,18 +109,18 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
   const [isDeletePatientModalOpen, setIsDeletePatientModalOpen] = useState<boolean>(false);
   const [isDeletingPatient, setIsDeletingPatient] = useState<boolean>(false);
 
-  // Clinical Record Modals State
-  const [activeModal, setActiveModal] = useState<'NONE' | 'SYMPTOM' | 'HISTORY' | 'ALLERGY' | 'MEDICATION'>('NONE');
+  // Record Modals State
+  const [activeModal, setActiveModal] = useState<'NONE' | 'SYMPTOM' | 'HISTORY' | 'ALLERGY' | 'MEDICATION' | 'REPORT'>('NONE');
   const [modalMode, setModalMode] = useState<'CREATE' | 'EDIT'>('CREATE');
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [isSubmittingRecord, setIsSubmittingRecord] = useState<boolean>(false);
   const [recordModalError, setRecordModalError] = useState<string | null>(null);
 
   // Delete Record Confirmation State
-  const [deleteRecordTarget, setDeleteRecordTarget] = useState<{ type: 'SYMPTOM' | 'HISTORY' | 'ALLERGY' | 'MEDICATION'; id: string; name: string } | null>(null);
+  const [deleteRecordTarget, setDeleteRecordTarget] = useState<{ type: 'SYMPTOM' | 'HISTORY' | 'ALLERGY' | 'MEDICATION' | 'REPORT'; id: string; name: string } | null>(null);
   const [isDeletingRecord, setIsDeletingRecord] = useState<boolean>(false);
 
-  // Form Fields for Clinical Modals
+  // Clinical Form Fields
   const [symName, setSymName] = useState<string>('');
   const [symSeverity, setSymSeverity] = useState<SymptomSeverity>('MODERATE');
   const [symDuration, setSymDuration] = useState<string>('');
@@ -119,6 +141,15 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
   const [medFrequency, setMedFrequency] = useState<string>('');
   const [medNotes, setMedNotes] = useState<string>('');
 
+  // Diagnostic Report Form Fields
+  const [repName, setRepName] = useState<string>('');
+  const [repType, setRepType] = useState<ReportType>('BLOOD_TEST');
+  const [repTestDate, setRepTestDate] = useState<string>('');
+  const [repLabName, setRepLabName] = useState<string>('');
+  const [repStatus, setRepStatus] = useState<ReportStatus>('COMPLETED');
+  const [repSummary, setRepSummary] = useState<string>('');
+  const [repReference, setRepReference] = useState<string>('');
+
   // Independent Section Fetchers
   const fetchSymptoms = async () => {
     setSymptomsState(prev => ({ ...prev, loading: true, error: null }));
@@ -126,8 +157,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       const data = await symptomService.getSymptoms(patientId);
       setSymptomsState({ data, loading: false, error: null });
     } catch (err) {
-      const msg = err instanceof ApiClientError ? err.message : 'Failed to load symptoms.';
-      setSymptomsState({ data: [], loading: false, error: msg });
+      setSymptomsState({ data: [], loading: false, error: err instanceof ApiClientError ? err.message : 'Failed to load symptoms.' });
     }
   };
 
@@ -137,8 +167,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       const data = await medicalHistoryService.getMedicalHistories(patientId);
       setHistoryState({ data, loading: false, error: null });
     } catch (err) {
-      const msg = err instanceof ApiClientError ? err.message : 'Failed to load medical history.';
-      setHistoryState({ data: [], loading: false, error: msg });
+      setHistoryState({ data: [], loading: false, error: err instanceof ApiClientError ? err.message : 'Failed to load medical history.' });
     }
   };
 
@@ -148,8 +177,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       const data = await allergyService.getAllergies(patientId);
       setAllergiesState({ data, loading: false, error: null });
     } catch (err) {
-      const msg = err instanceof ApiClientError ? err.message : 'Failed to load allergies.';
-      setAllergiesState({ data: [], loading: false, error: msg });
+      setAllergiesState({ data: [], loading: false, error: err instanceof ApiClientError ? err.message : 'Failed to load allergies.' });
     }
   };
 
@@ -159,8 +187,48 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       const data = await medicationService.getMedications(patientId);
       setMedicationsState({ data, loading: false, error: null });
     } catch (err) {
-      const msg = err instanceof ApiClientError ? err.message : 'Failed to load medications.';
-      setMedicationsState({ data: [], loading: false, error: msg });
+      setMedicationsState({ data: [], loading: false, error: err instanceof ApiClientError ? err.message : 'Failed to load medications.' });
+    }
+  };
+
+  const fetchReports = async () => {
+    setReportsState(prev => ({ ...prev, loading: true, error: null }));
+    try {
+      const data = await diagnosticReportService.getReports(patientId);
+      setReportsState({ data, loading: false, error: null });
+    } catch (err) {
+      setReportsState({ data: [], loading: false, error: err instanceof ApiClientError ? err.message : 'Failed to load diagnostic reports.' });
+    }
+  };
+
+  const fetchAssessments = async () => {
+    setAssessmentsState(prev => ({ ...prev, loading: true, error: null }));
+    try {
+      const data = await assessmentService.getAssessments(patientId);
+      setAssessmentsState({ data, loading: false, error: null });
+    } catch (err) {
+      setAssessmentsState({ data: [], loading: false, error: err instanceof ApiClientError ? err.message : 'Failed to load decision support assessments.' });
+    }
+  };
+
+  const handleCreateAssessment = async () => {
+    setIsCreatingAssessment(true);
+    try {
+      const newAssessment = await assessmentService.createAssessment(patientId);
+      setSuccessToast(`New Decision Support Assessment created.`);
+      setTimeout(() => setSuccessToast(null), 4000);
+      await fetchAssessments();
+      if (onSelectAssessment) {
+        onSelectAssessment(patientId, newAssessment.id);
+      }
+    } catch (err) {
+      setSuccessToast(null);
+      setAssessmentsState(prev => ({
+        ...prev,
+        error: err instanceof ApiClientError ? err.message : 'Failed to generate assessment.'
+      }));
+    } finally {
+      setIsCreatingAssessment(false);
     }
   };
 
@@ -182,13 +250,14 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     }
   };
 
-  // On mount or patientId change, fetch patient & all 4 clinical sections independently
   useEffect(() => {
     fetchPatientDetail();
     fetchSymptoms();
     fetchHistory();
     fetchAllergies();
     fetchMedications();
+    fetchReports();
+    fetchAssessments();
   }, [patientId]);
 
   // Patient Edit Handlers
@@ -209,12 +278,10 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     e.preventDefault();
     if (!patient) return;
     setEditError(null);
-
     if (!editFullName.trim() || !editDateOfBirth || !editPhone.trim()) {
       setEditError('Please fill required fields (Name, Date of Birth, Phone).');
       return;
     }
-
     setIsSavingEdit(true);
     try {
       const payload: PatientRequestDto = {
@@ -226,7 +293,6 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
         address: editAddress.trim() || undefined,
         bloodGroup: editBloodGroup || undefined
       };
-
       const updated = await patientService.updatePatient(patient.id, payload);
       setPatient(updated);
       setSuccessToast(`Patient ${updated.fullName} updated.`);
@@ -253,7 +319,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     }
   };
 
-  // Open Clinical Modals
+  // Open Modals
   const openSymptomModal = (symptom?: Symptom) => {
     setRecordModalError(null);
     if (symptom) {
@@ -334,12 +400,38 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     setActiveModal('MEDICATION');
   };
 
+  const openReportModal = (report?: DiagnosticReport) => {
+    setRecordModalError(null);
+    if (report) {
+      setModalMode('EDIT');
+      setSelectedRecordId(report.id);
+      setRepName(report.reportName);
+      setRepType(report.reportType);
+      setRepTestDate(report.testDate || '');
+      setRepLabName(report.labName || '');
+      setRepStatus(report.status);
+      setRepSummary(report.summary || '');
+      setRepReference(report.reportReference || '');
+    } else {
+      setModalMode('CREATE');
+      setSelectedRecordId(null);
+      setRepName('');
+      setRepType('BLOOD_TEST');
+      setRepTestDate(new Date().toISOString().split('T')[0]);
+      setRepLabName('');
+      setRepStatus('COMPLETED');
+      setRepSummary('');
+      setRepReference('');
+    }
+    setActiveModal('REPORT');
+  };
+
   const closeModal = () => {
     setActiveModal('NONE');
     setRecordModalError(null);
   };
 
-  // Submit Clinical Records
+  // Submit Handlers
   const handleSymptomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!symName.trim() || !symDuration.trim()) {
@@ -349,12 +441,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     setIsSubmittingRecord(true);
     setRecordModalError(null);
     try {
-      const payload: SymptomRequestDto = {
-        name: symName.trim(),
-        severity: symSeverity,
-        duration: symDuration.trim(),
-        notes: symNotes.trim() || undefined
-      };
+      const payload: SymptomRequestDto = { name: symName.trim(), severity: symSeverity, duration: symDuration.trim(), notes: symNotes.trim() || undefined };
       if (modalMode === 'CREATE') {
         await symptomService.createSymptom(patientId, payload);
         setSuccessToast(`Symptom "${payload.name}" recorded.`);
@@ -381,18 +468,13 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     setIsSubmittingRecord(true);
     setRecordModalError(null);
     try {
-      const payload: MedicalHistoryRequestDto = {
-        condition: histCondition.trim(),
-        status: histStatus,
-        diagnosedDate: histDiagnosedDate || undefined,
-        description: histDescription.trim() || undefined
-      };
+      const payload: MedicalHistoryRequestDto = { condition: histCondition.trim(), status: histStatus, diagnosedDate: histDiagnosedDate || undefined, description: histDescription.trim() || undefined };
       if (modalMode === 'CREATE') {
         await medicalHistoryService.createMedicalHistory(patientId, payload);
-        setSuccessToast(`Medical history condition "${payload.condition}" recorded.`);
+        setSuccessToast(`Medical condition "${payload.condition}" recorded.`);
       } else if (selectedRecordId) {
         await medicalHistoryService.updateMedicalHistory(patientId, selectedRecordId, payload);
-        setSuccessToast(`Medical history condition "${payload.condition}" updated.`);
+        setSuccessToast(`Medical condition "${payload.condition}" updated.`);
       }
       setTimeout(() => setSuccessToast(null), 4000);
       closeModal();
@@ -413,12 +495,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     setIsSubmittingRecord(true);
     setRecordModalError(null);
     try {
-      const payload: AllergyRequestDto = {
-        allergen: allAllergen.trim(),
-        reaction: allReaction.trim(),
-        severity: allSeverity,
-        notes: allNotes.trim() || undefined
-      };
+      const payload: AllergyRequestDto = { allergen: allAllergen.trim(), reaction: allReaction.trim(), severity: allSeverity, notes: allNotes.trim() || undefined };
       if (modalMode === 'CREATE') {
         await allergyService.createAllergy(patientId, payload);
         setSuccessToast(`Allergy "${payload.allergen}" recorded.`);
@@ -445,12 +522,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     setIsSubmittingRecord(true);
     setRecordModalError(null);
     try {
-      const payload: MedicationRequestDto = {
-        name: medName.trim(),
-        dosage: medDosage.trim(),
-        frequency: medFrequency.trim(),
-        notes: medNotes.trim() || undefined
-      };
+      const payload: MedicationRequestDto = { name: medName.trim(), dosage: medDosage.trim(), frequency: medFrequency.trim(), notes: medNotes.trim() || undefined };
       if (modalMode === 'CREATE') {
         await medicationService.createMedication(patientId, payload);
         setSuccessToast(`Medication "${payload.name}" prescribed.`);
@@ -463,6 +535,41 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       await fetchMedications();
     } catch (err) {
       setRecordModalError(err instanceof ApiClientError ? err.message : 'Failed to save medication.');
+    } finally {
+      setIsSubmittingRecord(false);
+    }
+  };
+
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!repName.trim() || !repTestDate) {
+      setRecordModalError('Report name and test date are required.');
+      return;
+    }
+    setIsSubmittingRecord(true);
+    setRecordModalError(null);
+    try {
+      const payload: DiagnosticReportRequestDto = {
+        reportName: repName.trim(),
+        reportType: repType,
+        testDate: repTestDate,
+        labName: repLabName.trim() || undefined,
+        status: repStatus,
+        summary: repSummary.trim() || undefined,
+        reportReference: repReference.trim() || undefined
+      };
+      if (modalMode === 'CREATE') {
+        await diagnosticReportService.createReport(patientId, payload);
+        setSuccessToast(`Diagnostic report "${payload.reportName}" uploaded.`);
+      } else if (selectedRecordId) {
+        await diagnosticReportService.updateReport(patientId, selectedRecordId, payload);
+        setSuccessToast(`Diagnostic report "${payload.reportName}" updated.`);
+      }
+      setTimeout(() => setSuccessToast(null), 4000);
+      closeModal();
+      await fetchReports();
+    } catch (err) {
+      setRecordModalError(err instanceof ApiClientError ? err.message : 'Failed to save diagnostic report.');
     } finally {
       setIsSubmittingRecord(false);
     }
@@ -486,6 +593,9 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
       } else if (type === 'MEDICATION') {
         await medicationService.deleteMedication(patientId, id);
         await fetchMedications();
+      } else if (type === 'REPORT') {
+        await diagnosticReportService.deleteReport(patientId, id);
+        await fetchReports();
       }
       setSuccessToast(`Deleted record "${name}".`);
       setTimeout(() => setSuccessToast(null), 4000);
@@ -497,7 +607,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
     }
   };
 
-  // Total Clinical Items Count
+  // Total Item Counts
   const totalClinicalCount = symptomsState.data.length + historyState.data.length + allergiesState.data.length + medicationsState.data.length;
 
   if (isLoadingPatient) {
@@ -553,7 +663,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
-      {/* Success Toast */}
+      {/* Toast Notification */}
       {successToast && (
         <div style={{ padding: '14px 20px', borderRadius: 'var(--radius-sm)', background: 'var(--emerald-light)', border: '1px solid rgba(16, 185, 129, 0.4)', color: 'var(--emerald)', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '10px' }} className="animate-fade-in">
           <CheckCircle2 size={18} />
@@ -610,8 +720,8 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
         {[
           { id: 'OVERVIEW', label: 'Overview & Summary', icon: Activity },
           { id: 'CLINICAL', label: `Clinical Records (${totalClinicalCount})`, icon: Stethoscope },
-          { id: 'REPORTS', label: 'Diagnostic Reports (0)', icon: FileText },
-          { id: 'ASSESSMENTS', label: 'Assessments (0)', icon: BrainCircuit }
+          { id: 'REPORTS', label: `Diagnostic Reports (${reportsState.data.length})`, icon: FileText },
+          { id: 'ASSESSMENTS', label: `Assessments (${assessmentsState.data.length})`, icon: BrainCircuit }
         ].map(t => (
           <button key={t.id} type="button" onClick={() => setActiveTab(t.id as any)} style={{ padding: '10px 18px', borderRadius: 'var(--radius-sm)', background: activeTab === t.id ? 'var(--primary-light)' : 'transparent', border: activeTab === t.id ? '1px solid var(--border-accent)' : '1px solid transparent', color: activeTab === t.id ? '#fff' : 'var(--text-muted)', fontSize: '13px', fontWeight: activeTab === t.id ? 600 : 400, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <t.icon size={16} color={activeTab === t.id ? 'var(--primary)' : 'var(--text-subtle)'} />
@@ -790,26 +900,208 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
         </div>
       )}
 
-      {/* DIAGNOSTIC REPORTS & ASSESSMENTS PLACEHOLDERS (Step 4+) */}
+      {/* DIAGNOSTIC REPORTS SECTION (Live API Integration) */}
       {(activeTab === 'OVERVIEW' || activeTab === 'REPORTS') && (
-        <SectionCard title="Diagnostic & Laboratory Reports" icon={FileText} iconColor="var(--primary)">
-          <EmptyState message="No diagnostic reports uploaded for this patient." />
+        <SectionCard
+          title="Diagnostic & Laboratory Reports"
+          icon={FileText}
+          iconColor="var(--primary)"
+          action={
+            <button type="button" onClick={() => openReportModal()} style={btnAddStyle}>
+              <Plus size={14} />
+              <span>Add Diagnostic Report</span>
+            </button>
+          }
+        >
+          {reportsState.loading ? (
+            <div style={sectionLoadingStyle}><Loader2 size={20} className="animate-pulse-slow" /><span>Loading diagnostic reports...</span></div>
+          ) : reportsState.error ? (
+            <div style={sectionErrorStyle}>
+              <span>{reportsState.error}</span>
+              <button type="button" onClick={fetchReports} style={btnRetryStyle}><RotateCcw size={12} /><span>Retry Reports</span></button>
+            </div>
+          ) : reportsState.data.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {reportsState.data.map((r) => (
+                <div key={r.id} style={{
+                  padding: '18px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(11, 15, 25, 0.6)',
+                  border: '1px solid var(--border-color)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <FileCheck size={18} color="var(--primary)" />
+                      <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-main)' }}>{r.reportName}</span>
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        background: 'rgba(99, 102, 241, 0.15)',
+                        color: '#a5b4fc',
+                        border: '1px solid var(--border-accent)'
+                      }}>
+                        {r.reportType}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <StatusBadge status={r.status} />
+                      <button type="button" onClick={() => openReportModal(r)} style={btnIconStyle} title="Edit Report"><Edit size={14} /></button>
+                      <button type="button" onClick={() => setDeleteRecordTarget({ type: 'REPORT', id: r.id, name: r.reportName })} style={btnDangerIconStyle} title="Delete Report"><Trash2 size={14} /></button>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                    <span>Test Date: <strong>{r.testDate}</strong></span>
+                    {r.labName && <span>Laboratory: <strong>{r.labName}</strong></span>}
+                    {r.reportReference && <span>Ref: <strong style={{ fontFamily: 'monospace' }}>{r.reportReference}</strong></span>}
+                  </div>
+
+                  {r.summary && (
+                    <div style={{
+                      padding: '10px 14px',
+                      borderRadius: '6px',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid var(--border-color)',
+                      fontSize: '13px',
+                      color: 'var(--text-main)',
+                      lineHeight: '1.4'
+                    }}>
+                      <strong>Summary:</strong> {r.summary}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="No diagnostic reports uploaded for this patient." />
+          )}
         </SectionCard>
       )}
 
+      {/* CLINICAL DECISION-SUPPORT ASSESSMENTS SECTION (Live API Integration) */}
       {(activeTab === 'OVERVIEW' || activeTab === 'ASSESSMENTS') && (
-        <SectionCard title="Clinical Decision-Support Assessments" icon={BrainCircuit} iconColor="var(--amber)">
-          <EmptyState message="No decision-support assessments generated for this patient yet." />
+        <SectionCard
+          title="Clinical Decision-Support Assessments"
+          icon={BrainCircuit}
+          iconColor="var(--amber)"
+          action={
+            <button
+              type="button"
+              onClick={handleCreateAssessment}
+              disabled={isCreatingAssessment}
+              style={btnAddStyle}
+            >
+              {isCreatingAssessment ? (
+                <Loader2 size={14} className="animate-pulse-slow" />
+              ) : (
+                <Plus size={14} />
+              )}
+              <span>Run Assessment</span>
+            </button>
+          }
+        >
+          {assessmentsState.loading ? (
+            <div style={sectionLoadingStyle}>
+              <Loader2 size={20} className="animate-pulse-slow" />
+              <span>Evaluating clinical decision rules...</span>
+            </div>
+          ) : assessmentsState.error ? (
+            <div style={sectionErrorStyle}>
+              <span>{assessmentsState.error}</span>
+              <button type="button" onClick={fetchAssessments} style={btnRetryStyle}>
+                <RotateCcw size={12} />
+                <span>Retry</span>
+              </button>
+            </div>
+          ) : assessmentsState.data.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {assessmentsState.data.map((assessment) => (
+                <div
+                  key={assessment.id}
+                  onClick={() => onSelectAssessment && onSelectAssessment(patientId, assessment.id)}
+                  style={{
+                    padding: '18px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(11, 15, 25, 0.6)',
+                    border: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <BrainCircuit size={20} color="var(--amber)" />
+                      <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-main)' }}>
+                        Assessment #{assessment.id.slice(-8)}
+                      </span>
+                      <StatusBadge status={assessment.status} />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {assessment.aiSummary ? (
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(6, 182, 212, 0.15)',
+                          color: 'var(--cyan)',
+                          border: '1px solid rgba(6, 182, 212, 0.3)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Sparkles size={12} />
+                          AI Summary Available
+                        </span>
+                      ) : (
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(255, 255, 255, 0.04)',
+                          color: 'var(--text-subtle)',
+                          border: '1px solid var(--border-color)'
+                        }}>
+                          Rule Engine Only
+                        </span>
+                      )}
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)' }}>
+                        View Details &rarr;
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                    <span>Findings: <strong style={{ color: '#fff' }}>{assessment.findings?.length || 0} rules triggered</strong></span>
+                    {assessment.createdAt && <span>Created: <strong>{new Date(assessment.createdAt).toLocaleString()}</strong></span>}
+                    {assessment.createdBy && <span>Evaluator: <strong>{assessment.createdBy}</strong></span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="No decision-support assessments generated for this patient yet. Click 'Run Assessment' to evaluate clinical rules." />
+          )}
         </SectionCard>
       )}
 
-      {/* CLINICAL RECORD MODALS */}
+      {/* RECORD MODALS */}
       {activeModal !== 'NONE' && (
         <div style={modalOverlayStyle} className="animate-fade-in">
           <div className="glass-panel" style={modalBoxStyle}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 700 }}>
-                {modalMode === 'CREATE' ? 'Add' : 'Edit'} {activeModal === 'SYMPTOM' ? 'Symptom' : activeModal === 'HISTORY' ? 'Medical Condition' : activeModal === 'ALLERGY' ? 'Allergy' : 'Medication'}
+                {modalMode === 'CREATE' ? 'Add' : 'Edit'} {activeModal === 'SYMPTOM' ? 'Symptom' : activeModal === 'HISTORY' ? 'Medical Condition' : activeModal === 'ALLERGY' ? 'Allergy' : activeModal === 'MEDICATION' ? 'Medication' : 'Diagnostic Report'}
               </h3>
               <button type="button" onClick={closeModal} style={btnIconStyle}><X size={20} /></button>
             </div>
@@ -932,6 +1224,69 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
               </form>
             )}
 
+            {/* DIAGNOSTIC REPORT FORM */}
+            {activeModal === 'REPORT' && (
+              <form onSubmit={handleReportSubmit} style={formStyle}>
+                <div style={fieldGroupStyle}>
+                  <label style={labelStyle}>Report Name *</label>
+                  <input type="text" required value={repName} onChange={e => setRepName(e.target.value)} placeholder="e.g. Complete Blood Count (CBC)" style={inputStyle} />
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div style={fieldGroupStyle}>
+                    <label style={labelStyle}>Report Type *</label>
+                    <select value={repType} onChange={e => setRepType(e.target.value as ReportType)} style={inputStyle}>
+                      <option value="BLOOD_TEST">Blood Test</option>
+                      <option value="URINE_TEST">Urine Test</option>
+                      <option value="IMAGING">Imaging</option>
+                      <option value="X_RAY">X-Ray</option>
+                      <option value="CT_SCAN">CT Scan</option>
+                      <option value="MRI">MRI</option>
+                      <option value="ULTRASOUND">Ultrasound</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </div>
+                  <div style={fieldGroupStyle}>
+                    <label style={labelStyle}>Test Date *</label>
+                    <input type="date" required value={repTestDate} onChange={e => setRepTestDate(e.target.value)} style={inputStyle} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div style={fieldGroupStyle}>
+                    <label style={labelStyle}>Processing Status *</label>
+                    <select value={repStatus} onChange={e => setRepStatus(e.target.value as ReportStatus)} style={inputStyle}>
+                      <option value="PENDING">Pending</option>
+                      <option value="COMPLETED">Completed</option>
+                      <option value="REVIEWED">Reviewed</option>
+                    </select>
+                  </div>
+                  <div style={fieldGroupStyle}>
+                    <label style={labelStyle}>Laboratory Name</label>
+                    <input type="text" value={repLabName} onChange={e => setRepLabName(e.target.value)} placeholder="e.g. Central Diagnostics Lab" style={inputStyle} />
+                  </div>
+                </div>
+
+                <div style={fieldGroupStyle}>
+                  <label style={labelStyle}>Report Reference Number</label>
+                  <input type="text" value={repReference} onChange={e => setRepReference(e.target.value)} placeholder="e.g. REF-LAB-2026-901" style={inputStyle} />
+                </div>
+
+                <div style={fieldGroupStyle}>
+                  <label style={labelStyle}>Clinical Findings & Summary</label>
+                  <textarea
+                    rows={3}
+                    value={repSummary}
+                    onChange={e => setRepSummary(e.target.value)}
+                    placeholder="e.g. Hemoglobin 14.2 g/dL, WBC 6,500 /mcL within normal limits..."
+                    style={{ ...inputStyle, resize: 'vertical' }}
+                  />
+                </div>
+
+                <ModalButtons isSubmitting={isSubmittingRecord} onCancel={closeModal} submitText={modalMode === 'CREATE' ? 'Upload Diagnostic Report' : 'Update Diagnostic Report'} />
+              </form>
+            )}
+
           </div>
         </div>
       )}
@@ -972,7 +1327,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
           <div className="glass-panel" style={{ ...modalBoxStyle, maxWidth: '440px', borderColor: 'rgba(244, 63, 94, 0.4)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--rose)' }}>
               <Trash2 size={24} />
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>Delete Clinical Record</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>Delete Record</h3>
             </div>
             <p style={{ fontSize: '14px', color: 'var(--text-main)' }}>
               Are you sure you want to delete <strong style={{ color: 'var(--rose)' }}>{deleteRecordTarget.name}</strong>?

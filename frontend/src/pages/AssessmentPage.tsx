@@ -1,5 +1,8 @@
-import React from 'react';
-import { MOCK_ASSESSMENTS, MOCK_PATIENTS } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+import type { Patient, Assessment } from '../types';
+import { patientService } from '../services/patientService';
+import { assessmentService } from '../services/assessmentService';
+import { ApiClientError } from '../services/apiClient';
 import { StatusBadge } from '../components/StatusBadge';
 import { SeverityBadge } from '../components/SeverityBadge';
 import { SectionCard } from '../components/SectionCard';
@@ -11,7 +14,10 @@ import {
   CheckCircle2, 
   Info,
   Clock,
-  UserCheck
+  UserCheck,
+  Loader2,
+  AlertCircle,
+  RotateCcw
 } from 'lucide-react';
 
 interface AssessmentPageProps {
@@ -25,17 +31,85 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
   assessmentId,
   onBack
 }) => {
-  const patient = MOCK_PATIENTS.find((p) => p.id === patientId) || MOCK_PATIENTS[0];
-  const assessments = MOCK_ASSESSMENTS[patient.id] || [];
-  const assessment = assessments.find((a) => a.id === assessmentId) || assessments[0];
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [assessment, setAssessment] = useState<Assessment | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!assessment) {
+  const [isGeneratingAi, setIsGeneratingAi] = useState<boolean>(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [patientData, assessmentData] = await Promise.all([
+        patientService.getPatient(patientId),
+        assessmentService.getAssessment(patientId, assessmentId)
+      ]);
+      setPatient(patientData);
+      setAssessment(assessmentData);
+    } catch (err) {
+      setError(err instanceof ApiClientError ? err.message : 'Failed to load assessment details.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [patientId, assessmentId]);
+
+  const handleGenerateAiSummary = async () => {
+    if (!assessment) return;
+    setIsGeneratingAi(true);
+    setAiError(null);
+    try {
+      const res = await assessmentService.generateAiSummary(patientId, assessmentId);
+      setAssessment(prev => prev ? { ...prev, aiSummary: res.aiSummary } : null);
+    } catch (err) {
+      setAiError(
+        err instanceof ApiClientError && err.message 
+          ? err.message 
+          : 'AI summary is currently unavailable. The assessment findings remain available for doctor review.'
+      );
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <div style={{ padding: '32px' }}>
-        <button type="button" onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer' }}>
-          &larr; Back
+      <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <button type="button" onClick={onBack} style={btnBackStyle}>
+          <ArrowLeft size={16} />
+          <span>Back to Patient Clinical Profile</span>
         </button>
-        <div style={{ marginTop: '20px' }}>Assessment not found.</div>
+        <div className="glass-panel" style={{ padding: '60px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--text-muted)' }}>
+          <Loader2 size={36} className="animate-pulse-slow" color="var(--amber)" />
+          <span>Loading clinical decision assessment details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !assessment) {
+    return (
+      <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <button type="button" onClick={onBack} style={btnBackStyle}>
+          <ArrowLeft size={16} />
+          <span>Back to Patient Clinical Profile</span>
+        </button>
+        <div className="glass-panel" style={{ padding: '32px', borderColor: 'rgba(244, 63, 94, 0.3)', background: 'var(--rose-light)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', color: 'var(--rose)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <AlertCircle size={24} />
+            <span>{error || 'Assessment not found.'}</span>
+          </div>
+          <button type="button" onClick={fetchData} style={{ padding: '8px 16px', borderRadius: 'var(--radius-sm)', background: 'var(--rose)', border: 'none', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <RotateCcw size={14} />
+            <span>Retry</span>
+          </button>
+        </div>
       </div>
     );
   }
@@ -45,22 +119,7 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
       
       {/* Back Button & Header */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <button
-          type="button"
-          onClick={onBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            width: 'fit-content'
-          }}
-        >
+        <button type="button" onClick={onBack} style={btnBackStyle}>
           <ArrowLeft size={16} />
           <span>Back to Patient Clinical Profile</span>
         </button>
@@ -94,24 +153,30 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                 <h2 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
-                  Clinical Assessment #{assessment.id}
+                  Clinical Assessment #{assessment.id.slice(-8)}
                 </h2>
                 <StatusBadge status={assessment.status} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '13px', color: 'var(--text-muted)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <UserCheck size={14} color="var(--emerald)" />
-                  <span>Patient: <strong>{patient.fullName}</strong> ({patient.patientId})</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Clock size={14} color="var(--text-subtle)" />
-                  <span>Evaluated: {assessment.createdAt}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Info size={14} color="var(--text-subtle)" />
-                  <span>Evaluator: {assessment.createdBy}</span>
-                </div>
+                {patient && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <UserCheck size={14} color="var(--emerald)" />
+                    <span>Patient: <strong>{patient.fullName}</strong> ({patient.patientId})</span>
+                  </div>
+                )}
+                {assessment.createdAt && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Clock size={14} color="var(--text-subtle)" />
+                    <span>Evaluated: {new Date(assessment.createdAt).toLocaleString()}</span>
+                  </div>
+                )}
+                {assessment.createdBy && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Info size={14} color="var(--text-subtle)" />
+                    <span>Evaluator: {assessment.createdBy}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -129,7 +194,7 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
             gap: '6px'
           }}>
             <CheckCircle2 size={16} />
-            <span>5 Deterministic Rules Evaluated</span>
+            <span>{assessment.findings?.length || 0} Deterministic Rules Triggered</span>
           </div>
         </div>
       </div>
@@ -144,57 +209,63 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
           icon={BrainCircuit}
           iconColor="var(--amber)"
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {assessment.findings.map((finding) => (
-              <div
-                key={finding.id}
-                style={{
-                  padding: '16px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(11, 15, 25, 0.6)',
-                  border: '1px solid var(--border-color)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      color: 'var(--text-muted)',
-                      border: '1px solid var(--border-color)'
-                    }}>
-                      {finding.category}
-                    </span>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
-                      {finding.title}
-                    </span>
+          {assessment.findings && assessment.findings.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {assessment.findings.map((finding) => (
+                <div
+                  key={finding.id}
+                  style={{
+                    padding: '16px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(11, 15, 25, 0.6)',
+                    border: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: 'var(--text-muted)',
+                        border: '1px solid var(--border-color)'
+                      }}>
+                        {finding.category}
+                      </span>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
+                        {finding.title}
+                      </span>
+                    </div>
+                    <SeverityBadge severity={finding.severity} />
                   </div>
-                  <SeverityBadge severity={finding.severity} />
-                </div>
 
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                  {finding.description}
-                </p>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    {finding.description}
+                  </p>
 
-                <div style={{
-                  fontSize: '11px',
-                  color: 'var(--text-subtle)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <span>Source:</span>
-                  <strong style={{ color: '#a5b4fc' }}>{finding.source}</strong>
+                  <div style={{
+                    fontSize: '11px',
+                    color: 'var(--text-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span>Source:</span>
+                    <strong style={{ color: '#a5b4fc' }}>{finding.source}</strong>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              No rule engine findings triggered for this clinical assessment.
+            </div>
+          )}
         </SectionCard>
 
         {/* Gemini AI Summary Section */}
@@ -203,8 +274,49 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
           subtitle="Structured summary based strictly on recorded facts & rule findings"
           icon={Sparkles}
           iconColor="var(--cyan)"
+          action={
+            !assessment.aiSummary && (
+              <button
+                type="button"
+                onClick={handleGenerateAiSummary}
+                disabled={isGeneratingAi}
+                style={btnAiGenerateStyle}
+              >
+                {isGeneratingAi ? (
+                  <Loader2 size={14} className="animate-pulse-slow" />
+                ) : (
+                  <Sparkles size={14} />
+                )}
+                <span>Generate AI Summary</span>
+              </button>
+            )
+          }
         >
-          {assessment.aiSummary ? (
+          {aiError && (
+            <div style={{
+              padding: '14px 16px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--amber-light)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              color: 'var(--amber)',
+              fontSize: '13px',
+              lineHeight: '1.4',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '16px'
+            }}>
+              <AlertCircle size={18} style={{ flexShrink: 0 }} />
+              <span>{aiError}</span>
+            </div>
+          )}
+
+          {isGeneratingAi ? (
+            <div style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', color: 'var(--cyan)' }}>
+              <Loader2 size={32} className="animate-pulse-slow" />
+              <span style={{ fontSize: '14px', fontWeight: 600 }}>Synthesizing clinical findings via Gemini AI...</span>
+            </div>
+          ) : assessment.aiSummary ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{
                 padding: '20px',
@@ -237,8 +349,18 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
               </div>
             </div>
           ) : (
-            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-              No AI summary generated for this assessment.
+            <div style={{ padding: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--text-muted)' }}>
+              <Sparkles size={36} color="var(--cyan)" style={{ opacity: 0.6 }} />
+              <span>No AI summary generated for this assessment yet.</span>
+              <button
+                type="button"
+                onClick={handleGenerateAiSummary}
+                disabled={isGeneratingAi}
+                style={btnAiGenerateStyle}
+              >
+                <Sparkles size={14} />
+                <span>Generate AI Summary via Gemini</span>
+              </button>
             </div>
           )}
         </SectionCard>
@@ -248,3 +370,6 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
     </div>
   );
 };
+
+const btnBackStyle: React.CSSProperties = { background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', width: 'fit-content' };
+const btnAiGenerateStyle: React.CSSProperties = { padding: '8px 16px', borderRadius: 'var(--radius-sm)', background: 'linear-gradient(135deg, var(--cyan) 0%, var(--primary) 100%)', border: 'none', color: '#fff', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 14px rgba(6, 182, 212, 0.35)' };
