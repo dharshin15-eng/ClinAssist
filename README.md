@@ -105,49 +105,70 @@ ClinAssist/
 
 ---
 
+---
+
 ## ☁️ Deployment Guide on Render
 
-The repository is pre-configured for deployment as two linked services on **Render**:
-1. **Backend Web Service** (Docker containerized)
-2. **Frontend Static Site** (Vite SPA production bundle)
+The repository is configured for deployment on **Render** via two options:
+- **Option A (Recommended):** Automated 1-Click Blueprint deployment via [`render.yaml`](./render.yaml).
+- **Option B:** Manual step-by-step configuration in the Render Dashboard.
 
 ---
 
-### Step 1: Deploy Backend Web Service
+### Option A: 1-Click Blueprint Deployment (`render.yaml`)
 
-1. Log in to your [Render Dashboard](https://dashboard.render.com/) and click **New +** &rarr; **Web Service**.
+1. Push your repository to GitHub.
+2. In the [Render Dashboard](https://dashboard.render.com/), click **New +** &rarr; **Blueprint**.
+3. Connect your GitHub repository (`dharshin15-eng/ClinAssist`).
+4. Render will parse [`render.yaml`](./render.yaml) and automatically create:
+   - **`clinassist-backend`** (Web Service, Docker runtime, root directory: `backend`)
+   - **`clinassist-frontend`** (Static Site, root directory: `frontend`, SPA rewrite rule: `/*` -> `/index.html`)
+5. Fill in the requested prompt variables in the dashboard:
+   - `MONGODB_URI`
+   - `GEMINI_API_KEY`
+   - `CORS_ALLOWED_ORIGINS`
+   - `VITE_API_BASE_URL`
+6. Click **Apply**.
+
+---
+
+### Option B: Manual Service Configuration in Render Dashboard
+
+#### Step 1: Deploy Backend Web Service
+
+1. In the Render Dashboard, click **New +** &rarr; **Web Service**.
 2. Connect your GitHub repository (`dharshin15-eng/ClinAssist`).
 3. Configure the following service settings:
-   - **Name:** `clinassist-backend` (or your preferred name)
-   - **Region:** Select the region closest to your MongoDB instance
+   - **Name:** `clinassist-backend`
+   - **Region:** Select the region closest to your MongoDB Atlas cluster (e.g. Frankfurt, Oregon, Singapore)
    - **Branch:** `master`
    - **Root Directory:** `backend`
    - **Runtime:** `Docker`
    - **Dockerfile Path:** `./Dockerfile`
-   - **Instance Type:** `Free` or higher
+   - **Instance Type:** `Free` (or higher)
 
-4. In the **Environment Variables** section, add:
-   | Key | Recommended Value | Notes |
-   |---|---|---|
-   | `MONGODB_URI` | `mongodb+srv://<user>:<password>@cluster.mongodb.net/clinassist?retryWrites=true&w=majority` | MongoDB Atlas connection string |
-   | `JWT_SECRET` | Strong 256-bit secret string | Used for signing HMAC-SHA256 tokens |
-   | `JWT_EXPIRATION_MS` | `86400000` | Token expiration time (24 hours) |
-   | `GEMINI_API_KEY` | `AIzaSy...` | Your Google Gemini API key |
-   | `GEMINI_MODEL` | `gemini-3.5-flash-lite` | Default optimized AI model |
-   | `GEMINI_TIMEOUT_MS`| `30000` | API call timeout |
-   | `CORS_ALLOWED_ORIGINS` | `https://<YOUR-FRONTEND-NAME>.onrender.com,http://localhost:5173` | Add your frontend Render URL once created |
+4. In the **Environment Variables** section, configure:
+   | Key | Recommended Value / Notes |
+   |---|---|
+   | `MONGODB_URI` | `mongodb+srv://<user>:<password>@cluster.mongodb.net/clinassist?retryWrites=true&w=majority` |
+   | `JWT_SECRET` | Secure 256-bit+ random secret (see generation helper below) |
+   | `JWT_EXPIRATION_MS` | `86400000` (24 hours) |
+   | `GEMINI_API_KEY` | Your Google Gemini API Key from Google AI Studio |
+   | `GEMINI_MODEL` | `gemini-3.5-flash-lite` |
+   | `GEMINI_TIMEOUT_MS`| `30000` |
+   | `CORS_ALLOWED_ORIGINS` | `https://<YOUR-FRONTEND>.onrender.com,http://localhost:5173` |
 
-5. Under **Advanced Settings**, configure Health Check:
+5. Under **Advanced Settings**, set:
    - **Health Check Path:** `/actuator/health`
 
-6. Click **Deploy Web Service**. Once deployed, copy your backend URL (e.g., `https://clinassist-backend.onrender.com`).
+6. Click **Deploy Web Service** and note your assigned URL (e.g., `https://clinassist-backend.onrender.com`).
 
 ---
 
-### Step 2: Deploy Frontend Static Site
+#### Step 2: Deploy Frontend Static Site
 
 1. In the Render Dashboard, click **New +** &rarr; **Static Site**.
-2. Connect the same GitHub repository (`dharshin15-eng/ClinAssist`).
+2. Connect the same repository (`dharshin15-eng/ClinAssist`).
 3. Configure the static site settings:
    - **Name:** `clinassist-frontend`
    - **Branch:** `master`
@@ -155,24 +176,44 @@ The repository is pre-configured for deployment as two linked services on **Rend
    - **Build Command:** `npm install && npm run build`
    - **Publish Directory:** `dist`
 
-4. In the **Environment Variables** section, add:
+4. In the **Environment Variables** section, set:
    | Key | Value | Description |
    |---|---|---|
-   | `VITE_API_BASE_URL` | `https://clinassist-backend.onrender.com` | Full HTTPS URL of your deployed Render backend |
+   | `VITE_API_BASE_URL` | `https://clinassist-backend.onrender.com` | Deployed backend URL (without trailing slash) |
 
-5. Under **Redirects and Rewrites**, add an SPA rewrite rule:
+5. Under **Redirects and Rewrites**, add the single-page application rewrite:
    - **Type:** `Rewrite`
    - **Source:** `/*`
    - **Destination:** `/index.html`
 
 6. Click **Deploy Static Site**.
 
-7. **Important Final Step:** Copy your published frontend URL (e.g., `https://clinassist-frontend.onrender.com`), go back to your **Backend Web Service** settings on Render, and update `CORS_ALLOWED_ORIGINS` to include this frontend URL.
+7. **Final Step:** Copy the published frontend URL (`https://clinassist-frontend.onrender.com`), navigate back to **`clinassist-backend` &rarr; Environment**, and update `CORS_ALLOWED_ORIGINS` to include this frontend URL.
+
+---
+
+## 🗄️ Database & Atlas Network Access
+
+Because Render uses dynamic outbound IP addresses for its services, you must configure MongoDB Atlas to permit connections:
+1. Log in to [MongoDB Atlas](https://cloud.mongodb.com/).
+2. Navigate to **Security** &rarr; **Network Access**.
+3. Click **Add IP Address**.
+4. Select **Allow Access From Anywhere** (`0.0.0.0/0`) or enter the dedicated outbound IPs if using a paid Render team plan.
+5. In **Database Access**, verify that the database user has `readWriteAnyDatabase` or `readWrite@clinassist` privileges.
 
 ---
 
 ## 🔒 Security Best Practices
 
 - **Never commit `.env` files or secret values:** All sensitive values are externalized via environment variables.
-- **Reference Template:** Use [`.env.example`](./.env.example) as a guide for required configuration parameters.
+- **Generating a Production JWT Secret:**
+  - **Linux / macOS:**
+    ```bash
+    openssl rand -base64 64
+    ```
+  - **Windows PowerShell:**
+    ```powershell
+    [Convert]::ToBase64String((1..64 | ForEach-Object { Get-Random -Maximum 256 } | [byte[]]$_))
+    ```
 - **RBAC & Token Security:** All protected endpoints require a valid JWT bearer token. Administrative routes are guarded with role-based authorization (`ADMIN`).
+- **Audit Logging:** Administrative user actions (creations, deletions, status changes) are recorded in the MongoDB audit log.

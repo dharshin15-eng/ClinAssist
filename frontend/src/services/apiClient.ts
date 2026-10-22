@@ -3,7 +3,8 @@
  * Handles base URL configuration, JWT bearer header attachment, and standardized error parsing.
  */
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim();
+const BASE_URL = rawBaseUrl.endsWith('/') ? rawBaseUrl.slice(0, -1) : rawBaseUrl;
 
 export interface ApiError {
   status: number;
@@ -90,7 +91,7 @@ export const apiClient = {
       if (err instanceof ApiClientError) {
         throw err;
       }
-      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+      throw new ApiClientError(0, 'Unable to connect to backend server. The service may be starting up or temporarily unavailable. Please try again.');
     }
   },
 
@@ -117,7 +118,7 @@ export const apiClient = {
       if (err instanceof ApiClientError) {
         throw err;
       }
-      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+      throw new ApiClientError(0, 'Unable to connect to backend server. The service may be starting up or temporarily unavailable. Please try again.');
     }
   },
 
@@ -139,7 +140,7 @@ export const apiClient = {
       if (err instanceof ApiClientError) {
         throw err;
       }
-      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+      throw new ApiClientError(0, 'Unable to connect to backend server. The service may be starting up or temporarily unavailable. Please try again.');
     }
   },
 
@@ -161,7 +162,7 @@ export const apiClient = {
       if (err instanceof ApiClientError) {
         throw err;
       }
-      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+      throw new ApiClientError(0, 'Unable to connect to backend server. The service may be starting up or temporarily unavailable. Please try again.');
     }
   },
 
@@ -186,7 +187,7 @@ export const apiClient = {
       if (err instanceof ApiClientError) {
         throw err;
       }
-      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+      throw new ApiClientError(0, 'Unable to connect to backend server. The service may be starting up or temporarily unavailable. Please try again.');
     }
   },
 
@@ -213,7 +214,7 @@ export const apiClient = {
       if (err instanceof ApiClientError) {
         throw err;
       }
-      throw new ApiClientError(0, 'Unable to connect to backend server. Please verify Spring Boot is running on port 8080.');
+      throw new ApiClientError(0, 'Unable to connect to backend server. The service may be starting up or temporarily unavailable. Please try again.');
     }
   }
 };
