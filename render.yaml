@@ -1,7 +1,8 @@
 # ==============================================================================
 # ClinAssist Render Blueprint Configuration
 # Deploys the Spring Boot 3 Backend as a Docker Web Service and the
-# React 18 + Vite Frontend as a Static Site.
+# React 18 + Vite Frontend as a Static Site (type: web, runtime: static).
+# Specification: https://render.com/docs/blueprint-spec
 # ==============================================================================
 
 services:
@@ -35,8 +36,9 @@ services:
   # ----------------------------------------------------------------------------
   # 2. Frontend Static Site (React 18 + Vite SPA)
   # ----------------------------------------------------------------------------
-  - type: static
+  - type: web
     name: clinassist-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
