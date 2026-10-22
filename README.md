@@ -173,7 +173,7 @@ The repository is configured for deployment on **Render** via two options:
    - **Name:** `clinassist-frontend`
    - **Branch:** `master`
    - **Root Directory:** `frontend`
-   - **Build Command:** `npm install && npm run build`
+   - **Build Command:** `npm ci && npm run build`
    - **Publish Directory:** `dist`
 
 4. In the **Environment Variables** section, set:
