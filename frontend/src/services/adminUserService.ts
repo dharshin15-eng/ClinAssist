@@ -25,6 +25,14 @@ export const adminUserService = {
   },
 
   /**
+   * Permanently delete a user account (ADMIN only).
+   * Returns void — backend responds with 204 No Content.
+   */
+  async deleteUser(userId: string): Promise<void> {
+    await apiClient.delete<void>(`/api/admin/users/${userId}`);
+  },
+
+  /**
    * Get list of audit log events (ADMIN only)
    */
   async getAuditLogs(): Promise<AuditLog[]> {

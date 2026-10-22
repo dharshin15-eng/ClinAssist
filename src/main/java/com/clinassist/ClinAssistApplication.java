@@ -9,7 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ClinAssistApplication {
 
+    static {
+        System.setProperty("java.net.preferIPv6Addresses", "true");
+    }
+
     public static void main(String[] args) {
+        System.setProperty("java.net.preferIPv6Addresses", "true");
         SpringApplication.run(ClinAssistApplication.class, args);
     }
 }

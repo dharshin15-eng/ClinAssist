@@ -4,6 +4,7 @@ import com.clinassist.dto.AdminCreateUserRequestDto;
 import com.clinassist.dto.UserResponseDto;
 import com.clinassist.entity.Role;
 import com.clinassist.entity.User;
+import com.clinassist.exception.AdminDeleteUserException;
 import com.clinassist.exception.InvalidCredentialsException;
 import com.clinassist.exception.SelfDisablingException;
 import com.clinassist.exception.UnauthorizedRoleAssignmentException;
@@ -97,5 +98,54 @@ public class AdminUserService {
         );
 
         return new UserResponseDto(savedUser);
+    }
+
+    /**
+     * Permanently deletes a user account.
+     * Enforces:
+     *   - User must exist.
+     *   - Admin cannot delete their own account.
+     *   - Cannot delete the last remaining ADMIN account.
+     * Does NOT delete patients, assessments, diagnostic reports, or audit logs.
+     * Records an ADMIN_DELETE_USER audit event that persists after deletion.
+     */
+    public void deleteUser(String targetUserId, String adminEmail) {
+        User targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new InvalidCredentialsException("User not found with id: " + targetUserId));
+
+        // Prevent self-deletion
+        if (targetUser.getEmail().equalsIgnoreCase(adminEmail)) {
+            throw new AdminDeleteUserException("Administrators cannot delete their own account.");
+        }
+
+        // Prevent deletion of the last ADMIN account
+        if (targetUser.getRole() == Role.ADMIN) {
+            long adminCount = userRepository.countByRole(Role.ADMIN);
+            if (adminCount <= 1) {
+                throw new AdminDeleteUserException(
+                        "Cannot delete the last remaining ADMIN account. At least one admin must remain in the system.");
+            }
+        }
+
+        // Capture identifying info BEFORE deletion for the audit log
+        String deletedUserId   = targetUser.getId();
+        String deletedEmail    = targetUser.getEmail();
+        String deletedFullName = targetUser.getFullName();
+        Role   deletedRole     = targetUser.getRole();
+
+        // Delete ONLY the user account document (patients/assessments/reports/logs untouched)
+        userRepository.deleteById(deletedUserId);
+
+        // Persist audit log so the record survives even after user is gone
+        auditLogService.logEvent(
+                adminEmail,
+                Role.ADMIN,
+                "ADMIN_DELETE_USER",
+                deletedUserId,
+                deletedEmail,
+                "Permanently deleted user: " + deletedFullName
+                        + " (" + deletedEmail + "), role: " + deletedRole,
+                true
+        );
     }
 }

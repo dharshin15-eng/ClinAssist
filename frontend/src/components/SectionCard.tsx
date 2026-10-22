@@ -39,7 +39,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
               width: '36px',
               height: '36px',
               borderRadius: 'var(--radius-sm)',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--primary-very-light)',
               border: '1px solid var(--border-color)',
               display: 'flex',
               alignItems: 'center',

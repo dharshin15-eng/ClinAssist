@@ -17,10 +17,15 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate }) => {
   const { user } = useAuth();
 
-  const navItems = [
+  const navItems: Array<{
+    id: string;
+    label: string;
+    icon: any;
+    badge?: string;
+  }> = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'patients', label: 'Patient Directory', icon: Users, badge: 'Phase 4-6' },
-    { id: 'assessment', label: 'Decision Engine', icon: BrainCircuit, badge: 'Phase 7' }
+    { id: 'patients', label: 'Patient Directory', icon: Users },
+    { id: 'assessment', label: 'Decision Engine', icon: BrainCircuit }
   ];
 
   if (user?.role === 'ADMIN') {
@@ -36,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate }) => {
     <aside style={{
       width: '260px',
       borderRight: '1px solid var(--border-color)',
-      background: 'rgba(11, 15, 25, 0.6)',
+      background: '#ffffff',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -69,28 +74,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate }) => {
                 justifyContent: 'space-between',
                 padding: '11px 14px',
                 borderRadius: 'var(--radius-sm)',
-                background: isActive ? 'var(--primary-light)' : 'transparent',
-                color: isActive ? '#ffffff' : 'var(--text-muted)',
-                border: isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
+                background: isActive ? '#E0F2FE' : 'transparent',
+                color: isActive ? '#0284C7' : '#475569',
+                border: isActive ? '1px solid #bae6fd' : '1px solid transparent',
                 cursor: 'pointer',
-                fontWeight: isActive ? 600 : 400,
+                fontWeight: isActive ? 600 : 500,
                 fontSize: '14px',
                 transition: 'all 0.2s ease'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Icon size={18} color={isActive ? 'var(--primary)' : 'var(--text-subtle)'} />
+                <Icon size={18} color={isActive ? '#0284C7' : '#64748b'} />
                 <span>{item.label}</span>
               </div>
               {item.badge && (
                 <span style={{
                   fontSize: '10px',
                   fontWeight: 600,
-                  padding: '2px 6px',
+                  padding: '2px 8px',
                   borderRadius: '4px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  color: 'var(--text-muted)',
-                  border: '1px solid var(--border-color)'
+                  background: '#E0F2FE',
+                  color: '#0284C7',
+                  border: '1px solid #bae6fd'
                 }}>
                   {item.badge}
                 </span>
@@ -104,18 +109,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate }) => {
       <div style={{
         padding: '16px',
         borderRadius: 'var(--radius-md)',
-        background: 'rgba(18, 26, 43, 0.5)',
-        border: '1px solid var(--border-color)',
+        background: '#f8fafc',
+        border: '1px solid #e2e8f0',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
-          <Settings size={14} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b' }}>
+          <Settings size={14} color="#64748b" />
           <span>Dev Engine: Active</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
-          <HelpCircle size={14} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#64748b' }}>
+          <HelpCircle size={14} color="#64748b" />
           <span>ClinAssist v1.0.0</span>
         </div>
       </div>

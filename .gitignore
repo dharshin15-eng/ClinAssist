@@ -1,7 +1,41 @@
+# Build outputs
 target/
+dist/
+dist-ssr/
+
+# Environment files and credentials
 .env
 .env.*
 !.env.example
+
+# IDE & Editor files
 .idea/
 .vscode/
 *.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Logs and runtime artifacts
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node dependencies
+node_modules/
+
+# Local machine-specific wrappers
+mvn.cmd
+
+# Scratch scripts and temporary test artifacts
+scratch/

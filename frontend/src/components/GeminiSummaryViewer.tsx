@@ -24,14 +24,14 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
         style={{
           padding: '24px',
           borderRadius: 'var(--radius-md)',
-          background: 'rgba(11, 15, 25, 0.75)',
-          border: '1px solid rgba(6, 182, 212, 0.25)',
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)',
           maxHeight: '650px',
           overflowY: 'auto',
           fontSize: '13.5px',
           lineHeight: '1.65',
-          color: 'var(--text-main)'
+          color: '#0f172a'
         }}
       >
         <ReactMarkdown
@@ -41,8 +41,8 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
               <div style={{
                 fontSize: '17px',
                 fontWeight: 700,
-                color: 'var(--cyan)',
-                borderBottom: '1px solid rgba(6, 182, 212, 0.3)',
+                color: '#0284c7',
+                borderBottom: '1px solid #bae6fd',
                 paddingBottom: '8px',
                 marginTop: '16px',
                 marginBottom: '12px',
@@ -50,7 +50,7 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <Sparkles size={18} color="var(--cyan)" />
+                <Sparkles size={18} color="#0284c7" />
                 <span>{children}</span>
               </div>
             ),
@@ -59,18 +59,18 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
               <div style={{
                 fontSize: '15px',
                 fontWeight: 700,
-                color: '#ffffff',
-                background: 'rgba(18, 26, 43, 0.8)',
+                color: '#0f172a',
+                background: '#e0f2fe',
                 padding: '8px 12px',
                 borderRadius: '6px',
-                borderLeft: '3px solid var(--cyan)',
+                borderLeft: '3px solid #0284c7',
                 marginTop: '20px',
                 marginBottom: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <Stethoscope size={16} color="var(--cyan)" />
+                <Stethoscope size={16} color="#0284c7" />
                 <span>{children}</span>
               </div>
             ),
@@ -79,14 +79,14 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
               <div style={{
                 fontSize: '14px',
                 fontWeight: 700,
-                color: 'var(--cyan)',
+                color: '#0284c7',
                 marginTop: '16px',
                 marginBottom: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px'
               }}>
-                <Activity size={14} color="var(--cyan)" />
+                <Activity size={14} color="#0284c7" />
                 <span>{children}</span>
               </div>
             ),
@@ -94,7 +94,7 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
             p: ({ children }) => (
               <p style={{
                 marginBottom: '12px',
-                color: 'var(--text-main)',
+                color: '#0f172a',
                 lineHeight: '1.65'
               }}>
                 {children}
@@ -133,11 +133,11 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
 
               return (
                 <li style={{
-                  color: isHighRisk ? '#fecdd3' : 'var(--text-main)',
-                  background: isHighRisk ? 'rgba(244, 63, 94, 0.08)' : 'transparent',
+                  color: isHighRisk ? '#dc2626' : '#0f172a',
+                  background: isHighRisk ? '#fee2e2' : 'transparent',
                   padding: isHighRisk ? '6px 10px' : '2px 0',
                   borderRadius: isHighRisk ? '6px' : '0',
-                  border: isHighRisk ? '1px solid rgba(244, 63, 94, 0.3)' : 'none',
+                  border: isHighRisk ? '1px solid #fca5a5' : 'none',
                   lineHeight: '1.6'
                 }}>
                   {children}
@@ -157,9 +157,9 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
                     gap: '4px',
                     padding: '2px 6px',
                     borderRadius: '4px',
-                    background: 'var(--rose-light)',
-                    color: 'var(--rose)',
-                    border: '1px solid rgba(244, 63, 94, 0.3)',
+                    background: '#fee2e2',
+                    color: '#dc2626',
+                    border: '1px solid #fca5a5',
                     fontWeight: 700,
                     fontSize: '12px'
                   }}>
@@ -170,7 +170,7 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
               }
 
               return (
-                <strong style={{ fontWeight: 700, color: '#ffffff' }}>
+                <strong style={{ fontWeight: 700, color: '#0f172a' }}>
                   {children}
                 </strong>
               );
@@ -179,7 +179,7 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
             hr: () => (
               <hr style={{
                 border: 'none',
-                borderTop: '1px solid var(--border-color)',
+                borderTop: '1px solid #e2e8f0',
                 margin: '20px 0'
               }} />
             )
@@ -193,15 +193,15 @@ export const GeminiSummaryViewer: React.FC<GeminiSummaryViewerProps> = ({ summar
       <div style={{
         padding: '12px 16px',
         borderRadius: 'var(--radius-sm)',
-        background: 'rgba(245, 158, 11, 0.05)',
-        border: '1px solid rgba(245, 158, 11, 0.25)',
+        background: '#fffbe6',
+        border: '1px solid #fde68a',
         display: 'flex',
         alignItems: 'flex-start',
         gap: '10px'
       }}>
-        <ShieldAlert size={18} color="var(--amber)" style={{ flexShrink: 0, marginTop: '2px' }} />
-        <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.45' }}>
-          <strong style={{ color: 'var(--amber)' }}>Doctor Responsibility Note:</strong> This Gemini AI summary provides decision support only. It does not replace independent physician clinical evaluation, diagnosis, prescribing, or treatment decisions.
+        <ShieldAlert size={18} color="#d97706" style={{ flexShrink: 0, marginTop: '2px' }} />
+        <span style={{ fontSize: '12px', color: '#475569', lineHeight: '1.45' }}>
+          <strong style={{ color: '#d97706' }}>Doctor Responsibility Note:</strong> This Gemini AI summary provides decision support only. It does not replace independent physician clinical evaluation, diagnosis, prescribing, or treatment decisions.
         </span>
       </div>
 

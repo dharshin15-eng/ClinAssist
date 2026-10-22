@@ -73,8 +73,8 @@ export const LoginPage: React.FC = () => {
       setEmail('staff@hospital.com');
       setPassword('StaffSecret#2026');
     } else if (role === 'ADMIN') {
-      setEmail('admin@hospital.com');
-      setPassword('AdminSecret#2026');
+      setEmail('Dharshin@gmail.com');
+      setPassword('Dharshin2428');
     }
   };
 
@@ -97,35 +97,35 @@ export const LoginPage: React.FC = () => {
             width: '56px',
             height: '56px',
             borderRadius: '16px',
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%)',
+            background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 8px 24px rgba(99, 102, 241, 0.35)'
+            boxShadow: '0 8px 24px rgba(14, 165, 233, 0.3)'
           }}>
             <Activity size={32} color="#ffffff" />
           </div>
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.5px', color: '#ffffff' }}>
+            <h1 style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.5px', color: '#0f172a' }}>
               ClinAssist Portal
             </h1>
-            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
+            <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
               AI-Powered Healthcare Decision-Support Platform
             </p>
           </div>
         </div>
 
         {/* Login Card */}
-        <div className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="glass-panel" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', background: '#ffffff' }}>
           
           {/* Backend Connection Error Alert */}
           {errorMessage && (
             <div style={{
               padding: '12px 16px',
               borderRadius: 'var(--radius-sm)',
-              background: 'var(--rose-light)',
-              border: '1px solid rgba(244, 63, 94, 0.3)',
-              color: 'var(--rose)',
+              background: '#fee2e2',
+              border: '1px solid #fca5a5',
+              color: '#dc2626',
               fontSize: '13px',
               display: 'flex',
               alignItems: 'flex-start',
@@ -141,7 +141,7 @@ export const LoginPage: React.FC = () => {
             
             {/* Email Field */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
                 Email Address
               </label>
               <div style={{ position: 'relative' }}>
@@ -150,7 +150,7 @@ export const LoginPage: React.FC = () => {
                   left: '14px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: 'var(--text-subtle)'
+                  color: '#64748b'
                 }}>
                   <Mail size={18} />
                 </div>
@@ -163,22 +163,22 @@ export const LoginPage: React.FC = () => {
                     width: '100%',
                     padding: '12px 14px 12px 42px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.8)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-main)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     fontSize: '14px',
                     outline: 'none',
                     transition: 'all 0.2s ease'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-                  onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                  onFocus={(e) => e.target.style.borderColor = '#0ea5e9'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
@@ -187,7 +187,7 @@ export const LoginPage: React.FC = () => {
                   left: '14px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: 'var(--text-subtle)'
+                  color: '#64748b'
                 }}>
                   <Lock size={18} />
                 </div>
@@ -200,15 +200,15 @@ export const LoginPage: React.FC = () => {
                     width: '100%',
                     padding: '12px 42px 12px 42px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.8)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-main)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     fontSize: '14px',
                     outline: 'none',
                     transition: 'all 0.2s ease'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-                  onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                  onFocus={(e) => e.target.style.borderColor = '#0ea5e9'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                 />
                 <button
                   type="button"
@@ -220,7 +220,7 @@ export const LoginPage: React.FC = () => {
                     transform: 'translateY(-50%)',
                     background: 'none',
                     border: 'none',
-                    color: 'var(--text-muted)',
+                    color: '#64748b',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -242,7 +242,7 @@ export const LoginPage: React.FC = () => {
                 width: '100%',
                 padding: '14px',
                 borderRadius: 'var(--radius-sm)',
-                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
+                background: '#0ea5e9',
                 border: 'none',
                 color: '#ffffff',
                 fontSize: '15px',
@@ -252,7 +252,7 @@ export const LoginPage: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+                boxShadow: '0 4px 14px rgba(14, 165, 233, 0.3)',
                 opacity: isLoading ? 0.8 : 1,
                 transition: 'all 0.2s ease',
                 marginTop: '8px'
@@ -275,12 +275,12 @@ export const LoginPage: React.FC = () => {
           {/* Quick Pre-fill Demo Inputs */}
           <div style={{
             paddingTop: '16px',
-            borderTop: '1px solid var(--border-color)',
+            borderTop: '1px solid #e2e8f0',
             display: 'flex',
             flexDirection: 'column',
             gap: '10px'
           }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-subtle)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#64748b' }}>
               Fill Example Credentials
             </span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
@@ -290,9 +290,9 @@ export const LoginPage: React.FC = () => {
                 style={{
                   padding: '8px 6px',
                   borderRadius: '6px',
-                  background: 'var(--primary-light)',
-                  border: '1px solid var(--border-accent)',
-                  color: '#a5b4fc',
+                  background: '#e0f2fe',
+                  border: '1px solid #bae6fd',
+                  color: '#0284c7',
                   fontSize: '11px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -312,9 +312,9 @@ export const LoginPage: React.FC = () => {
                 style={{
                   padding: '8px 6px',
                   borderRadius: '6px',
-                  background: 'var(--emerald-light)',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                  color: 'var(--emerald)',
+                  background: '#d1fae5',
+                  border: '1px solid #a7f3d0',
+                  color: '#059669',
                   fontSize: '11px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -334,9 +334,9 @@ export const LoginPage: React.FC = () => {
                 style={{
                   padding: '8px 6px',
                   borderRadius: '6px',
-                  background: 'var(--cyan-light)',
-                  border: '1px solid rgba(6, 182, 212, 0.3)',
-                  color: 'var(--cyan)',
+                  background: '#e0f2fe',
+                  border: '1px solid #bae6fd',
+                  color: '#0284c7',
                   fontSize: '11px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -358,14 +358,14 @@ export const LoginPage: React.FC = () => {
         <div style={{
           padding: '14px 16px',
           borderRadius: 'var(--radius-sm)',
-          background: 'rgba(18, 26, 43, 0.4)',
-          border: '1px solid var(--border-color)',
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
           display: 'flex',
           alignItems: 'center',
           gap: '12px'
         }}>
-          <ShieldAlert size={18} color="var(--amber)" style={{ flexShrink: 0 }} />
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+          <ShieldAlert size={18} color="#f59e0b" style={{ flexShrink: 0 }} />
+          <p style={{ fontSize: '11px', color: '#64748b', lineHeight: '1.4' }}>
             Authorized healthcare professional access only. ClinAssist decision support provides clinical insights for doctor review.
           </p>
         </div>

@@ -38,8 +38,8 @@ public class GeminiService {
     public GeminiService(
             @Value("${gemini.api-key:}") String apiKey,
             @Value("${gemini.api-url:https://generativelanguage.googleapis.com/v1beta/models}") String apiUrl,
-            @Value("${gemini.model:gemini-1.5-flash}") String model,
-            @Value("${gemini.timeout-ms:10000}") int timeoutMs) {
+            @Value("${gemini.model:gemini-3.5-flash-lite}") String model,
+            @Value("${gemini.timeout-ms:30000}") int timeoutMs) {
         this(apiKey, apiUrl, model, timeoutMs, createRestTemplate(timeoutMs), 2000L);
     }
 

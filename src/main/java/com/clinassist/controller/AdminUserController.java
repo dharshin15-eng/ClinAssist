@@ -60,4 +60,13 @@ public class AdminUserController {
         List<AuditLog> auditLogs = auditLogService.getAllAuditLogs();
         return ResponseEntity.ok(auditLogs);
     }
+
+    @DeleteMapping("/users/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable String userId,
+                                           Authentication authentication) {
+        String adminEmail = authentication != null ? authentication.getName() : "ADMIN";
+        adminUserService.deleteUser(userId, adminEmail);
+        return ResponseEntity.noContent().build();
+    }
 }

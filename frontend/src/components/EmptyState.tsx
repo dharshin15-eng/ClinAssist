@@ -24,24 +24,24 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       gap: '12px',
-      background: 'rgba(11, 15, 25, 0.4)',
+      background: '#f8fafc',
       borderRadius: 'var(--radius-md)',
-      border: '1px dashed var(--border-color)'
+      border: '1px dashed #cbd5e1'
     }}>
       <div style={{
         width: '48px',
         height: '48px',
         borderRadius: '50%',
-        background: 'rgba(255, 255, 255, 0.04)',
+        background: '#e0f2fe',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'var(--text-subtle)'
+        color: '#0284c7'
       }}>
         <Icon size={24} />
       </div>
       <div>
-        <h4 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-main)', marginBottom: '4px' }}>
+        <h4 style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>
           {title}
         </h4>
         <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '380px' }}>

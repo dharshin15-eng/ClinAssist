@@ -25,12 +25,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       case 'RESOLVED':
         return {
           bg: 'var(--primary-light)',
-          color: '#a5b4fc',
+          color: 'var(--primary)',
           border: 'var(--border-accent)'
         };
       default:
         return {
-          bg: 'rgba(255, 255, 255, 0.05)',
+          bg: '#f1f5f9',
           color: 'var(--text-muted)',
           border: 'var(--border-color)'
         };

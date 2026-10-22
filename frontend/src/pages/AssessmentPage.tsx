@@ -375,8 +375,8 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
       {patient && (
         <div className="glass-panel" style={{
           padding: '24px 28px',
-          background: 'linear-gradient(135deg, rgba(18, 26, 43, 0.9) 0%, rgba(11, 15, 25, 0.9) 100%)',
-          borderColor: 'var(--border-accent)',
+          background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+          borderColor: '#bae6fd',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px'
@@ -387,11 +387,12 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
                 width: '52px',
                 height: '52px',
                 borderRadius: '14px',
-                background: 'linear-gradient(135deg, var(--primary) 0%, var(--emerald) 100%)',
+                background: '#e0f2fe',
+                border: '1px solid #bae6fd',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: '#0284c7',
                 fontSize: '22px',
                 fontWeight: 700
               }}>
@@ -572,9 +573,9 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
                       style={{
                         padding: '16px',
                         borderRadius: 'var(--radius-sm)',
-                        background: isHigh ? 'rgba(244, 63, 94, 0.05)' : 'rgba(11, 15, 25, 0.6)',
-                        border: isHigh ? '1px solid rgba(244, 63, 94, 0.35)' : '1px solid var(--border-color)',
-                        borderLeft: isHigh ? '4px solid var(--rose)' : '1px solid var(--border-color)',
+                        background: isHigh ? '#fee2e2' : '#ffffff',
+                        border: isHigh ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+                        borderLeft: isHigh ? '4px solid #ef4444' : '1px solid #e2e8f0',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '8px'
@@ -805,8 +806,8 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
                 <div key={r.id} style={{
                   padding: '16px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(11, 15, 25, 0.6)',
-                  border: '1px solid var(--border-color)',
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px'
@@ -926,7 +927,7 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: 'rgba(18, 26, 43, 0.9)'
+              background: 'var(--primary-very-light)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Paperclip size={18} color="var(--emerald)" />
@@ -961,15 +962,15 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
       {/* Safety Disclaimer Footer */}
       <div className="glass-panel" style={{
         padding: '18px 24px',
-        borderColor: 'rgba(245, 158, 11, 0.2)',
-        background: 'rgba(245, 158, 11, 0.04)',
+        borderColor: '#fde68a',
+        background: '#fffbe6',
         display: 'flex',
         alignItems: 'center',
         gap: '16px'
       }}>
-        <ShieldAlert size={22} color="var(--amber)" style={{ flexShrink: 0 }} />
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-          <strong style={{ color: 'var(--amber)' }}>Clinical Safety Disclaimer:</strong> ClinAssist decision support provides structured clinical findings, deterministic rule-engine evaluations, and Gemini AI summaries for physician review. It does not replace independent professional medical judgment. Final clinical decisions rest entirely with the attending doctor.
+        <ShieldAlert size={22} color="#d97706" style={{ flexShrink: 0 }} />
+        <div style={{ fontSize: '12px', color: '#475569', lineHeight: '1.5' }}>
+          <strong style={{ color: '#d97706' }}>Clinical Safety Disclaimer:</strong> ClinAssist decision support provides structured clinical findings, deterministic rule-engine evaluations, and Gemini AI summaries for physician review. It does not replace independent professional medical judgment. Final clinical decisions rest entirely with the attending doctor.
         </div>
       </div>
 
@@ -977,6 +978,6 @@ export const AssessmentPage: React.FC<AssessmentPageProps> = ({
   );
 };
 
-const btnBackStyle: React.CSSProperties = { background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' };
-const itemBoxStyle: React.CSSProperties = { padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(11, 15, 25, 0.6)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '4px' };
-const fileBtnStyle: React.CSSProperties = { padding: '4px 8px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.08)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '11px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' };
+const btnBackStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' };
+const itemBoxStyle: React.CSSProperties = { padding: '12px', borderRadius: 'var(--radius-sm)', background: '#ffffff', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '4px' };
+const fileBtnStyle: React.CSSProperties = { padding: '4px 8px', borderRadius: '4px', background: '#e0f2fe', border: '1px solid #bae6fd', color: '#0284c7', fontSize: '11px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' };

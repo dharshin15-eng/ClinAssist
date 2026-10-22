@@ -137,8 +137,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* Doctor Welcome Banner */}
       <div className="glass-panel" style={{
         padding: '24px 28px',
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.14) 0%, rgba(6, 182, 212, 0.08) 100%)',
-        borderColor: 'var(--border-accent)',
+        background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+        borderColor: '#bae6fd',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -152,21 +152,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               fontWeight: 700,
               padding: '3px 10px',
               borderRadius: '12px',
-              background: 'var(--primary-light)',
-              color: '#a5b4fc',
-              border: '1px solid var(--border-accent)',
+              background: '#e0f2fe',
+              color: '#0284c7',
+              border: '1px solid #bae6fd',
               letterSpacing: '0.5px'
             }}>
               ROLE: {user?.role || 'DOCTOR'}
             </span>
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '13px', color: '#64748b' }}>
               Doctor Clinical Workspace
             </span>
           </div>
-          <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.5px', color: '#ffffff' }}>
-            Welcome back, {user?.fullName ? `Dr. ${user.fullName}` : 'Doctor'}
+          <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.5px', color: '#0f172a' }}>
+            {user?.role === 'DOCTOR' ? 'Welcome, Doctor' : `Welcome, ${user?.fullName || ''}`}
           </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '680px', lineHeight: '1.5' }}>
+          <p style={{ fontSize: '13px', color: '#475569', maxWidth: '680px', lineHeight: '1.5' }}>
             Overview of accessible patient records, recent clinical decision-support assessments, rule-engine findings, and Gemini AI summaries.
           </p>
         </div>
@@ -179,9 +179,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             style={{
               padding: '10px',
               borderRadius: 'var(--radius-sm)',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-muted)',
+              background: '#ffffff',
+              border: '1px solid #cbd5e1',
+              color: '#64748b',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -198,7 +198,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             style={{
               padding: '11px 18px',
               borderRadius: 'var(--radius-sm)',
-              background: 'var(--primary)',
+              background: '#0ea5e9',
               border: 'none',
               color: '#ffffff',
               fontSize: '13px',
@@ -207,7 +207,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+              boxShadow: '0 4px 12px rgba(14, 165, 233, 0.25)',
               transition: 'all 0.2s ease'
             }}
           >
@@ -229,32 +229,32 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           value={isLoading ? '...' : totalPatients}
           subtitle="Managed in MongoDB database"
           icon={Users}
-          color="var(--emerald)"
-          bgColor="var(--emerald-light)"
+          color="#10b981"
+          bgColor="#d1fae5"
         />
         <StatCard
           title="Total Clinical Assessments"
           value={isLoading ? '...' : totalAssessments}
           subtitle="Evaluated by Rule Engine"
           icon={BrainCircuit}
-          color="var(--amber)"
-          bgColor="var(--amber-light)"
+          color="#d97706"
+          bgColor="#fef3c7"
         />
         <StatCard
           title="Completed / Reviewed"
           value={isLoading ? '...' : completedAssessmentsCount}
           subtitle={`${draftAssessmentsCount} draft assessments pending`}
           icon={CheckCircle2}
-          color="var(--primary)"
-          bgColor="var(--primary-light)"
+          color="#0284c7"
+          bgColor="#e0f2fe"
         />
         <StatCard
           title="AI Summaries Generated"
           value={isLoading ? '...' : aiSummariesCount}
           subtitle="Gemini AI clinical decision support"
           icon={Sparkles}
-          color="var(--cyan)"
-          bgColor="var(--cyan-light)"
+          color="#0284c7"
+          bgColor="#e0f2fe"
         />
       </div>
 
@@ -270,15 +270,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           title="Clinical Decision Assessments"
           subtitle="Rule engine evaluations & AI summaries for doctor review"
           icon={BrainCircuit}
-          iconColor="var(--amber)"
+          iconColor="#0284c7"
           action={
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{
                 display: 'flex',
-                background: 'rgba(11, 15, 25, 0.8)',
+                background: '#f8fafc',
                 padding: '3px',
                 borderRadius: '6px',
-                border: '1px solid var(--border-color)'
+                border: '1px solid #e2e8f0'
               }}>
                 <button
                   type="button"
@@ -288,8 +288,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    background: statusFilter === 'ALL' ? 'var(--primary)' : 'transparent',
-                    color: statusFilter === 'ALL' ? '#ffffff' : 'var(--text-muted)',
+                    background: statusFilter === 'ALL' ? '#0ea5e9' : 'transparent',
+                    color: statusFilter === 'ALL' ? '#ffffff' : '#64748b',
                     border: 'none',
                     cursor: 'pointer'
                   }}
@@ -304,8 +304,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    background: statusFilter === 'COMPLETED' ? 'var(--emerald)' : 'transparent',
-                    color: statusFilter === 'COMPLETED' ? '#ffffff' : 'var(--text-muted)',
+                    background: statusFilter === 'COMPLETED' ? '#10b981' : 'transparent',
+                    color: statusFilter === 'COMPLETED' ? '#ffffff' : '#64748b',
                     border: 'none',
                     cursor: 'pointer'
                   }}
@@ -320,8 +320,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    background: statusFilter === 'DRAFT' ? 'var(--amber)' : 'transparent',
-                    color: statusFilter === 'DRAFT' ? '#ffffff' : 'var(--text-muted)',
+                    background: statusFilter === 'DRAFT' ? '#f59e0b' : 'transparent',
+                    color: statusFilter === 'DRAFT' ? '#ffffff' : '#64748b',
                     border: 'none',
                     cursor: 'pointer'
                   }}
@@ -334,7 +334,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         >
           {/* Search Box */}
           <div style={{ marginBottom: '16px', position: 'relative' }}>
-            <Search size={14} color="var(--text-subtle)" style={{ position: 'absolute', left: '12px', top: '11px' }} />
+            <Search size={14} color="#64748b" style={{ position: 'absolute', left: '12px', top: '11px' }} />
             <input
               type="text"
               placeholder="Search assessment by patient name or ID..."
@@ -343,10 +343,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               style={{
                 width: '100%',
                 padding: '8px 12px 8px 34px',
-                background: 'rgba(11, 15, 25, 0.6)',
-                border: '1px solid var(--border-color)',
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
                 borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-main)',
+                color: '#0f172a',
                 fontSize: '12px',
                 outline: 'none'
               }}
@@ -354,12 +354,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </div>
 
           {isLoading ? (
-            <div style={{ padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--text-muted)' }}>
-              <Loader2 size={20} className="animate-spin" color="var(--primary)" />
+            <div style={{ padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#64748b' }}>
+              <Loader2 size={20} className="animate-spin" color="#0ea5e9" />
               <span>Loading clinical assessments...</span>
             </div>
           ) : error ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: '#f87171', fontSize: '13px' }}>
+            <div style={{ padding: '24px', textAlign: 'center', color: '#dc2626', fontSize: '13px' }}>
               <AlertCircle size={20} style={{ margin: '0 auto 8px auto' }} />
               <div>{error}</div>
             </div>
@@ -377,27 +377,27 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     style={{
                       padding: '14px 16px',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(11, 15, 25, 0.6)',
-                      border: '1px solid var(--border-color)',
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border-accent)'}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = '#bae6fd'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e2e8f0'}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{
                         width: '36px',
                         height: '36px',
                         borderRadius: '8px',
-                        background: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? 'var(--emerald-light)' : 'var(--amber-light)',
+                        background: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? '#d1fae5' : '#fef3c7',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? 'var(--emerald)' : 'var(--amber)',
+                        color: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? '#059669' : '#d97706',
                         flexShrink: 0
                       }}>
                         <BrainCircuit size={18} />
@@ -405,10 +405,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
                             {a.patientName}
                           </span>
-                          <span style={{ fontSize: '11px', color: 'var(--text-subtle)', fontFamily: 'monospace' }}>
+                          <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
                             ({a.patientDisplayId})
                           </span>
                         </div>
@@ -419,14 +419,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                             fontWeight: 700,
                             padding: '2px 6px',
                             borderRadius: '4px',
-                            background: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                            color: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? 'var(--emerald)' : 'var(--amber)',
-                            border: `1px solid ${a.status === 'COMPLETED' || a.status === 'REVIEWED' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
+                            background: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? '#d1fae5' : '#fef3c7',
+                            color: a.status === 'COMPLETED' || a.status === 'REVIEWED' ? '#059669' : '#d97706',
+                            border: `1px solid ${a.status === 'COMPLETED' || a.status === 'REVIEWED' ? '#a7f3d0' : '#fde68a'}`
                           }}>
                             {a.status}
                           </span>
 
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>
                             {findingsCount} {findingsCount === 1 ? 'Finding' : 'Findings'}
                           </span>
 
@@ -436,9 +436,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                               fontWeight: 700,
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              background: 'rgba(239, 68, 68, 0.15)',
-                              color: '#f87171',
-                              border: '1px solid rgba(239, 68, 68, 0.3)'
+                              background: '#fee2e2',
+                              color: '#dc2626',
+                              border: '1px solid #fca5a5'
                             }}>
                               HIGH RISK
                             </span>
@@ -450,9 +450,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                               fontWeight: 600,
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              background: 'rgba(6, 182, 212, 0.12)',
-                              color: 'var(--cyan)',
-                              border: '1px solid rgba(6, 182, 212, 0.3)',
+                              background: '#e0f2fe',
+                              color: '#0284c7',
+                              border: '1px solid #bae6fd',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '3px'
@@ -465,17 +465,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
                         {a.createdAt ? new Date(a.createdAt).toLocaleDateString() : ''}
                       </span>
-                      <ChevronRight size={18} color="var(--text-subtle)" />
+                      <ChevronRight size={18} color="#94a3b8" />
                     </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
               No assessments found matching the current filter. Select a patient to run a decision-support assessment.
             </div>
           )}
@@ -486,7 +486,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           title="Accessible Patient Directory"
           subtitle="Select a patient to open clinical record or run assessment"
           icon={UserCheck}
-          iconColor="var(--emerald)"
+          iconColor="#059669"
           action={
             <button
               type="button"
@@ -494,7 +494,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--primary)',
+                color: '#0ea5e9',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -509,8 +509,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           }
         >
           {isLoading ? (
-            <div style={{ padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--text-muted)' }}>
-              <Loader2 size={20} className="animate-spin" color="var(--emerald)" />
+            <div style={{ padding: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#64748b' }}>
+              <Loader2 size={20} className="animate-spin" color="#10b981" />
               <span>Loading patient directory...</span>
             </div>
           ) : recentPatients.length > 0 ? (
@@ -521,8 +521,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   style={{
                     padding: '14px 16px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.6)',
-                    border: '1px solid var(--border-color)',
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -537,11 +537,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       width: '36px',
                       height: '36px',
                       borderRadius: '50%',
-                      background: 'var(--primary-light)',
+                      background: '#e0f2fe',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'var(--primary)',
+                      color: '#0284c7',
                       fontWeight: 700,
                       fontSize: '14px',
                       flexShrink: 0
@@ -549,10 +549,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       {p.fullName.charAt(0)}
                     </div>
                     <div>
-                      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
                         {p.fullName}
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>
                         {p.patientId || 'PAT-RECORD'} • DOB: {p.dateOfBirth} ({p.gender})
                       </div>
                     </div>
@@ -565,9 +565,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       style={{
                         padding: '6px 12px',
                         borderRadius: 'var(--radius-sm)',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-main)',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        color: '#0f172a',
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -583,9 +583,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       style={{
                         padding: '6px 10px',
                         borderRadius: 'var(--radius-sm)',
-                        background: 'var(--primary-light)',
-                        border: '1px solid var(--border-accent)',
-                        color: 'var(--primary)',
+                        background: '#e0f2fe',
+                        border: '1px solid #bae6fd',
+                        color: '#0284c7',
                         fontSize: '12px',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -602,7 +602,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               ))}
             </div>
           ) : (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+            <div style={{ padding: '32px 16px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
               No patient records registered yet. Click &quot;Patient Directory&quot; to register a patient.
             </div>
           )}
@@ -613,15 +613,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* Safety & Compliance Disclaimer Footer */}
       <div className="glass-panel" style={{
         padding: '18px 24px',
-        borderColor: 'rgba(245, 158, 11, 0.2)',
-        background: 'rgba(245, 158, 11, 0.04)',
+        borderColor: '#fde68a',
+        background: '#fffbe6',
         display: 'flex',
         alignItems: 'center',
         gap: '16px'
       }}>
-        <ShieldAlert size={22} color="var(--amber)" style={{ flexShrink: 0 }} />
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-          <strong style={{ color: 'var(--amber)' }}>Clinical Safety Disclaimer:</strong> ClinAssist decision support provides structured clinical findings, deterministic rule-engine evaluations, and Gemini AI summaries for physician review. It does not replace independent professional medical judgment. Final clinical decisions rest entirely with the attending doctor.
+        <ShieldAlert size={22} color="#d97706" style={{ flexShrink: 0 }} />
+        <div style={{ fontSize: '12px', color: '#475569', lineHeight: '1.5' }}>
+          <strong style={{ color: '#d97706' }}>Clinical Safety Disclaimer:</strong> ClinAssist decision support provides structured clinical findings, deterministic rule-engine evaluations, and Gemini AI summaries for physician review. It does not replace independent professional medical judgment. Final clinical decisions rest entirely with the attending doctor.
         </div>
       </div>
 

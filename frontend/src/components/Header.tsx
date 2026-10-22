@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Activity, ShieldCheck, Cpu, LogOut } from 'lucide-react';
+import { Activity, ShieldCheck, LogOut } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -9,8 +9,8 @@ export const Header: React.FC = () => {
     <header style={{
       height: '68px',
       borderBottom: '1px solid var(--border-color)',
-      background: 'rgba(11, 15, 25, 0.85)',
-      backdropFilter: 'blur(12px)',
+      background: '#ffffff',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -25,62 +25,21 @@ export const Header: React.FC = () => {
           width: '40px',
           height: '40px',
           borderRadius: '10px',
-          background: 'linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%)',
+          background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
+          boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)'
         }}>
           <Activity size={22} color="#ffffff" />
         </div>
         <div>
-          <h1 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px', color: '#ffffff' }}>
+          <h1 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px', color: '#0f172a' }}>
             ClinAssist
           </h1>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>
             AI-Powered Healthcare Decision-Support Platform
           </p>
-        </div>
-      </div>
-
-      {/* Center Status Indicators */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 14px',
-          borderRadius: '20px',
-          background: 'var(--emerald-light)',
-          border: '1px solid rgba(16, 185, 129, 0.3)',
-          fontSize: '12px',
-          color: 'var(--emerald)',
-          fontWeight: 600
-        }}>
-          <span style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: 'var(--emerald)',
-            boxShadow: '0 0 10px var(--emerald)'
-          }} className="animate-pulse-slow" />
-          Backend Ready (Java 21 + Spring Boot + MongoDB)
-        </div>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 14px',
-          borderRadius: '20px',
-          background: 'var(--primary-light)',
-          border: '1px solid var(--border-accent)',
-          fontSize: '12px',
-          color: '#a5b4fc',
-          fontWeight: 600
-        }}>
-          <Cpu size={14} color="#a5b4fc" />
-          Frontend Auth UI (Vite + React + TS)
         </div>
       </div>
 
@@ -93,14 +52,14 @@ export const Header: React.FC = () => {
             gap: '8px',
             padding: '6px 12px',
             borderRadius: '8px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid var(--border-color)',
+            background: '#e0f2fe',
+            border: '1px solid #bae6fd',
             fontSize: '13px',
-            color: 'var(--text-main)'
+            color: '#0284c7'
           }}>
-            <ShieldCheck size={16} color="var(--cyan)" />
+            <ShieldCheck size={16} color="#0284c7" />
             <span style={{ fontWeight: 600 }}>{user.role}</span>
-            <span style={{ color: 'var(--text-subtle)' }}>({user.fullName})</span>
+            <span style={{ color: '#475569' }}>({user.fullName})</span>
           </div>
         )}
 
@@ -112,11 +71,11 @@ export const Header: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '8px 12px',
+            padding: '8px 14px',
             borderRadius: 'var(--radius-sm)',
-            background: 'var(--rose-light)',
-            border: '1px solid rgba(244, 63, 94, 0.3)',
-            color: 'var(--rose)',
+            background: '#fee2e2',
+            border: '1px solid #fca5a5',
+            color: '#dc2626',
             fontSize: '12px',
             fontWeight: 600,
             cursor: 'pointer',

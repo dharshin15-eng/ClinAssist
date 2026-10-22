@@ -688,7 +688,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
         <div className="glass-panel" style={{ padding: '40px', borderColor: 'rgba(244, 63, 94, 0.3)', background: 'var(--rose-light)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', textAlign: 'center', color: 'var(--rose)' }}>
           <AlertCircle size={40} />
           <h3>Patient Record Not Found</h3>
-          <p style={{ color: 'var(--text-muted)' }}>No patient record exists with MongoDB ID: <code style={{ color: '#a5b4fc' }}>{patientId}</code></p>
+          <p style={{ color: 'var(--text-muted)' }}>No patient record exists with MongoDB ID: <code style={{ color: 'var(--primary)', fontWeight: 600 }}>{patientId}</code></p>
           <button type="button" onClick={onBack} style={{ padding: '10px 20px', borderRadius: 'var(--radius-sm)', background: 'var(--primary)', border: 'none', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Return to Directory</button>
         </div>
       </div>
@@ -731,9 +731,9 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
           <span>Back to Patients Directory</span>
         </button>
 
-        <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, rgba(18, 26, 43, 0.9) 0%, rgba(11, 15, 25, 0.9) 100%)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '24px' }}>
+        <div className="glass-panel" style={{ padding: '28px', background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', borderColor: '#bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--primary) 0%, var(--cyan) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '24px', boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: '#e0f2fe', border: '1px solid #bae6fd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7', fontWeight: 700, fontSize: '24px', boxShadow: '0 4px 12px rgba(14, 165, 233, 0.2)' }}>
               {patient.fullName.charAt(0)}
             </div>
 
@@ -761,8 +761,8 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
               <button type="button" onClick={handleOpenEditModal} style={btnEditStyle}><Edit size={14} /><span>Edit Profile</span></button>
               <button type="button" onClick={() => setIsDeletePatientModalOpen(true)} style={btnDeleteStyle}><Trash2 size={14} /><span>Delete Patient</span></button>
             </div>
-            <div style={{ padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-color)', fontSize: '11px', color: 'var(--text-subtle)', fontFamily: 'monospace' }}>
-              Mongo ID: <span style={{ color: '#a5b4fc', fontWeight: 600 }}>{patient.id}</span>
+            <div style={{ padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--primary-very-light)', border: '1px solid var(--border-accent)', fontSize: '11px', color: 'var(--text-subtle)', fontFamily: 'monospace' }}>
+              Mongo ID: <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{patient.id}</span>
             </div>
           </div>
         </div>
@@ -776,7 +776,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
           { id: 'REPORTS', label: `Diagnostic Reports (${reportsState.data.length})`, icon: FileText },
           { id: 'ASSESSMENTS', label: `Assessments (${assessmentsState.data.length})`, icon: BrainCircuit }
         ].map(t => (
-          <button key={t.id} type="button" onClick={() => setActiveTab(t.id as any)} style={{ padding: '10px 18px', borderRadius: 'var(--radius-sm)', background: activeTab === t.id ? 'var(--primary-light)' : 'transparent', border: activeTab === t.id ? '1px solid var(--border-accent)' : '1px solid transparent', color: activeTab === t.id ? '#fff' : 'var(--text-muted)', fontSize: '13px', fontWeight: activeTab === t.id ? 600 : 400, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button key={t.id} type="button" onClick={() => setActiveTab(t.id as any)} style={{ padding: '10px 18px', borderRadius: 'var(--radius-sm)', background: activeTab === t.id ? 'var(--primary-light)' : 'transparent', border: activeTab === t.id ? '1px solid var(--border-accent)' : '1px solid transparent', color: activeTab === t.id ? 'var(--primary)' : 'var(--text-muted)', fontSize: '13px', fontWeight: activeTab === t.id ? 600 : 400, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <t.icon size={16} color={activeTab === t.id ? 'var(--primary)' : 'var(--text-subtle)'} />
             <span>{t.label}</span>
           </button>
@@ -979,11 +979,12 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                 <div key={r.id} style={{
                   padding: '18px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(11, 15, 25, 0.6)',
+                  background: '#ffffff',
                   border: '1px solid var(--border-color)',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '10px'
+                  gap: '10px',
+                  boxShadow: 'var(--shadow-card)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -994,8 +995,8 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                         fontWeight: 600,
                         padding: '2px 8px',
                         borderRadius: '6px',
-                        background: 'rgba(99, 102, 241, 0.15)',
-                        color: '#a5b4fc',
+                        background: 'var(--primary-light)',
+                        color: 'var(--primary)',
                         border: '1px solid var(--border-accent)'
                       }}>
                         {r.reportType}
@@ -1019,8 +1020,8 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                     <div style={{
                       padding: '10px 14px',
                       borderRadius: '6px',
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      border: '1px solid var(--border-color)',
+                      background: 'var(--primary-very-light)',
+                      border: '1px solid var(--border-accent)',
                       fontSize: '13px',
                       color: 'var(--text-main)',
                       lineHeight: '1.4'
@@ -1033,8 +1034,8 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                     <div style={{
                       padding: '10px 14px',
                       borderRadius: '6px',
-                      background: 'rgba(99, 102, 241, 0.08)',
-                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                      background: 'var(--primary-very-light)',
+                      border: '1px solid var(--border-accent)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -1042,17 +1043,17 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                       gap: '10px',
                       fontSize: '13px'
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#a5b4fc' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)' }}>
                         <Paperclip size={16} />
                         <span style={{ fontWeight: 600 }}>{r.fileName}</span>
-                        {r.fileSize && <span style={{ fontSize: '11px', color: 'var(--text-subtle)' }}>({formatFileSize(r.fileSize)})</span>}
+                        {r.fileSize && <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>({formatFileSize(r.fileSize)})</span>}
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <button
                           type="button"
                           onClick={() => handleViewFile(r)}
-                          style={{ padding: '4px 10px', borderRadius: '4px', background: 'var(--primary-light)', border: '1px solid var(--border-accent)', color: '#a5b4fc', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          style={{ padding: '4px 10px', borderRadius: '4px', background: 'var(--primary-light)', border: '1px solid var(--border-accent)', color: 'var(--primary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                         >
                           <Eye size={12} />
                           <span>View Report</span>
@@ -1060,7 +1061,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                         <button
                           type="button"
                           onClick={() => handleDownloadFile(r)}
-                          style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          style={{ padding: '4px 10px', borderRadius: '4px', background: '#f1f5f9', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                         >
                           <Download size={12} />
                           <span>Download</span>
@@ -1121,12 +1122,14 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                   style={{
                     padding: '18px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.6)',
+                    background: '#ffffff',
                     border: '1px solid var(--border-color)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '12px',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow-card)',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
@@ -1161,8 +1164,8 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                           fontWeight: 600,
                           padding: '2px 8px',
                           borderRadius: '6px',
-                          background: 'rgba(255, 255, 255, 0.04)',
-                          color: 'var(--text-subtle)',
+                          background: '#f1f5f9',
+                          color: 'var(--text-muted)',
                           border: '1px solid var(--border-color)'
                         }}>
                           Rule Engine Only
@@ -1175,7 +1178,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
                   </div>
 
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                    <span>Findings: <strong style={{ color: '#fff' }}>{assessment.findings?.length || 0} rules triggered</strong></span>
+                    <span>Findings: <strong style={{ color: 'var(--text-main)' }}>{assessment.findings?.length || 0} rules triggered</strong></span>
                     {assessment.createdAt && <span>Created: <strong>{new Date(assessment.createdAt).toLocaleString()}</strong></span>}
                     {assessment.createdBy && <span>Evaluator: <strong>{assessment.createdBy}</strong></span>}
                   </div>
@@ -1441,7 +1444,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
           <div className="glass-panel" style={{ ...modalBoxStyle, maxWidth: '440px', borderColor: 'rgba(244, 63, 94, 0.4)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--rose)' }}>
               <Trash2 size={24} />
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>Delete Record</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main)' }}>Delete Record</h3>
             </div>
             <p style={{ fontSize: '14px', color: 'var(--text-main)' }}>
               Are you sure you want to delete <strong style={{ color: 'var(--rose)' }}>{deleteRecordTarget.name}</strong>?
@@ -1463,7 +1466,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
           <div className="glass-panel" style={{ ...modalBoxStyle, maxWidth: '440px', borderColor: 'rgba(244, 63, 94, 0.4)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--rose)' }}>
               <Trash2 size={24} />
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>Delete Patient</h3>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main)' }}>Delete Patient</h3>
             </div>
             <p style={{ fontSize: '14px', color: 'var(--text-main)' }}>
               Are you sure you want to delete <strong style={{ color: 'var(--rose)' }}>{patient.fullName}</strong> ({patient.patientId})?
@@ -1486,7 +1489,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <FileText size={20} color="var(--primary)" />
-                <span style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>{previewModalFile.name}</span>
+                <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)' }}>{previewModalFile.name}</span>
               </div>
               <button
                 type="button"
@@ -1500,7 +1503,7 @@ export const PatientProfilePage: React.FC<PatientProfilePageProps> = ({
               </button>
             </div>
 
-            <div style={{ flex: 1, overflow: 'hidden', marginTop: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ flex: 1, overflow: 'hidden', marginTop: '12px', borderRadius: 'var(--radius-sm)', background: '#f1f5f9', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {previewModalFile.type.includes('image') ? (
                 <img src={previewModalFile.url} alt={previewModalFile.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
               ) : previewModalFile.type.includes('pdf') ? (
@@ -1536,24 +1539,24 @@ const ModalButtons: React.FC<{ isSubmitting: boolean; onCancel: () => void; subm
   </div>
 );
 
-const btnBackStyle: React.CSSProperties = { background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', width: 'fit-content' };
-const btnEditStyle: React.CSSProperties = { padding: '8px 14px', borderRadius: 'var(--radius-sm)', background: 'var(--primary-light)', border: '1px solid var(--border-accent)', color: '#a5b4fc', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
-const btnDeleteStyle: React.CSSProperties = { padding: '8px 14px', borderRadius: 'var(--radius-sm)', background: 'var(--rose-light)', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--rose)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
-const btnAddStyle: React.CSSProperties = { padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--primary-light)', border: '1px solid var(--border-accent)', color: '#a5b4fc', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' };
-const btnIconStyle: React.CSSProperties = { background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', borderRadius: '4px' };
-const btnDangerIconStyle: React.CSSProperties = { background: 'none', border: 'none', color: 'var(--rose)', cursor: 'pointer', padding: '4px', borderRadius: '4px' };
-const btnRetryStyle: React.CSSProperties = { padding: '4px 10px', borderRadius: '4px', background: 'var(--rose)', border: 'none', color: '#fff', fontSize: '11px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' };
-const btnCancelStyle: React.CSSProperties = { padding: '10px 18px', borderRadius: 'var(--radius-sm)', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '14px', fontWeight: 600, cursor: 'pointer' };
-const btnSubmitStyle: React.CSSProperties = { padding: '10px 22px', borderRadius: 'var(--radius-sm)', background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)', border: 'none', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)' };
-const btnSubmitDangerStyle: React.CSSProperties = { padding: '10px 20px', borderRadius: 'var(--radius-sm)', background: 'var(--rose)', border: 'none', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(244, 63, 94, 0.35)' };
+const btnBackStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#64748b', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', width: 'fit-content' };
+const btnEditStyle: React.CSSProperties = { padding: '8px 14px', borderRadius: 'var(--radius-sm)', background: '#e0f2fe', border: '1px solid #bae6fd', color: '#0284c7', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+const btnDeleteStyle: React.CSSProperties = { padding: '8px 14px', borderRadius: 'var(--radius-sm)', background: '#fee2e2', border: '1px solid #fca5a5', color: '#dc2626', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' };
+const btnAddStyle: React.CSSProperties = { padding: '6px 12px', borderRadius: 'var(--radius-sm)', background: '#e0f2fe', border: '1px solid #bae6fd', color: '#0284c7', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' };
+const btnIconStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '4px', borderRadius: '4px' };
+const btnDangerIconStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '4px', borderRadius: '4px' };
+const btnRetryStyle: React.CSSProperties = { padding: '4px 10px', borderRadius: '4px', background: '#dc2626', border: 'none', color: '#fff', fontSize: '11px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' };
+const btnCancelStyle: React.CSSProperties = { padding: '10px 18px', borderRadius: 'var(--radius-sm)', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#64748b', fontSize: '14px', fontWeight: 600, cursor: 'pointer' };
+const btnSubmitStyle: React.CSSProperties = { padding: '10px 22px', borderRadius: 'var(--radius-sm)', background: '#0ea5e9', border: 'none', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(14, 165, 233, 0.25)' };
+const btnSubmitDangerStyle: React.CSSProperties = { padding: '10px 20px', borderRadius: 'var(--radius-sm)', background: '#dc2626', border: 'none', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(220, 38, 38, 0.25)' };
 
-const recordCardStyle: React.CSSProperties = { padding: '14px', borderRadius: 'var(--radius-sm)', background: 'rgba(11, 15, 25, 0.6)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '6px' };
-const sectionLoadingStyle: React.CSSProperties = { padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: 'var(--text-muted)', fontSize: '13px' };
-const sectionErrorStyle: React.CSSProperties = { padding: '12px 16px', borderRadius: 'var(--radius-sm)', background: 'var(--rose-light)', border: '1px solid rgba(244, 63, 94, 0.3)', color: 'var(--rose)', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' };
+const recordCardStyle: React.CSSProperties = { padding: '14px', borderRadius: 'var(--radius-sm)', background: '#ffffff', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '6px' };
+const sectionLoadingStyle: React.CSSProperties = { padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#64748b', fontSize: '13px' };
+const sectionErrorStyle: React.CSSProperties = { padding: '12px 16px', borderRadius: 'var(--radius-sm)', background: '#fee2e2', border: '1px solid #fca5a5', color: '#dc2626', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' };
 
-const modalOverlayStyle: React.CSSProperties = { position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(5, 8, 15, 0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' };
-const modalBoxStyle: React.CSSProperties = { width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)' };
+const modalOverlayStyle: React.CSSProperties = { position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' };
+const modalBoxStyle: React.CSSProperties = { width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto', padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px', background: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(15, 23, 42, 0.15)' };
 const formStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '16px' };
 const fieldGroupStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '6px' };
-const labelStyle: React.CSSProperties = { fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' };
-const inputStyle: React.CSSProperties = { padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(11, 15, 25, 0.8)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '14px', outline: 'none' };
+const labelStyle: React.CSSProperties = { fontSize: '13px', fontWeight: 600, color: '#0f172a' };
+const inputStyle: React.CSSProperties = { padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: '#ffffff', border: '1px solid #cbd5e1', color: '#0f172a', fontSize: '14px', outline: 'none' };

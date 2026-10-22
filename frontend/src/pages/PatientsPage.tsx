@@ -224,7 +224,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
             style={{
               padding: '10px 18px',
               borderRadius: 'var(--radius-sm)',
-              background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
+              background: '#0ea5e9',
               border: 'none',
               color: '#ffffff',
               fontSize: '14px',
@@ -233,7 +233,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+              boxShadow: '0 4px 12px rgba(14, 165, 233, 0.25)',
               transition: 'all 0.2s ease'
             }}
           >
@@ -244,7 +244,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
       </div>
 
       {/* Search & Filter Controls */}
-      <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+      <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', background: '#ffffff' }}>
         
         {/* Search Input */}
         <div style={{ flex: 1, minWidth: '260px', position: 'relative' }}>
@@ -253,7 +253,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
             left: '14px',
             top: '50%',
             transform: 'translateY(-50%)',
-            color: 'var(--text-subtle)'
+            color: '#64748b'
           }}>
             <Search size={18} />
           </div>
@@ -266,9 +266,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
               width: '100%',
               padding: '10px 14px 10px 42px',
               borderRadius: 'var(--radius-sm)',
-              background: 'rgba(11, 15, 25, 0.8)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-main)',
+              background: '#ffffff',
+              border: '1px solid #cbd5e1',
+              color: '#0f172a',
               fontSize: '14px',
               outline: 'none'
             }}
@@ -277,17 +277,17 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
 
         {/* Blood Group Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Filter size={16} color="var(--text-muted)" />
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>Blood Group:</span>
+          <Filter size={16} color="#64748b" />
+          <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Blood Group:</span>
           <select
             value={selectedBloodFilter}
             onChange={(e) => setSelectedBloodFilter(e.target.value)}
             style={{
               padding: '10px 14px',
               borderRadius: 'var(--radius-sm)',
-              background: 'rgba(11, 15, 25, 0.8)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-main)',
+              background: '#ffffff',
+              border: '1px solid #cbd5e1',
+              color: '#0f172a',
               fontSize: '13px',
               outline: 'none',
               cursor: 'pointer'
@@ -316,21 +316,21 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
           alignItems: 'center',
           justifyContent: 'center',
           gap: '16px',
-          color: 'var(--text-muted)'
+          color: '#64748b'
         }}>
-          <Loader2 size={32} className="animate-pulse-slow" color="var(--primary)" />
+          <Loader2 size={32} className="animate-pulse-slow" color="#0ea5e9" />
           <span style={{ fontSize: '14px', fontWeight: 500 }}>Fetching patient records from backend...</span>
         </div>
       ) : errorMessage ? (
         <div className="glass-panel" style={{
           padding: '24px',
-          borderColor: 'rgba(244, 63, 94, 0.3)',
-          background: 'var(--rose-light)',
+          borderColor: '#fca5a5',
+          background: '#fee2e2',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '16px',
-          color: 'var(--rose)'
+          color: '#dc2626'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <AlertCircle size={22} style={{ flexShrink: 0 }} />
@@ -342,7 +342,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
             style={{
               padding: '8px 16px',
               borderRadius: 'var(--radius-sm)',
-              background: 'var(--rose)',
+              background: '#dc2626',
               border: 'none',
               color: '#ffffff',
               fontSize: '13px',
@@ -354,14 +354,14 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
           </button>
         </div>
       ) : filteredPatients.length > 0 ? (
-        <div className="glass-panel" style={{ overflow: 'hidden' }}>
+        <div className="glass-panel" style={{ overflow: 'hidden', background: '#ffffff' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
               <thead>
                 <tr style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  borderBottom: '1px solid var(--border-color)',
-                  color: 'var(--text-muted)',
+                  background: '#f8fafc',
+                  borderBottom: '1px solid #e2e8f0',
+                  color: '#64748b',
                   fontSize: '12px',
                   fontWeight: 600,
                   textTransform: 'uppercase',
@@ -381,32 +381,32 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   <tr
                     key={p.id}
                     style={{
-                      borderBottom: '1px solid var(--border-color)',
+                      borderBottom: '1px solid #e2e8f0',
                       transition: 'background 0.2s ease'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
                   >
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontWeight: 700, color: 'var(--primary)', fontFamily: 'monospace' }}>
+                        <span style={{ fontWeight: 700, color: '#0ea5e9', fontFamily: 'monospace' }}>
                           {p.patientId || 'N/A'}
                         </span>
-                        <span style={{ fontSize: '11px', color: 'var(--text-subtle)', fontFamily: 'monospace' }}>
+                        <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'monospace' }}>
                           ID: {p.id.substring(0, 8)}...
                         </span>
                       </div>
                     </td>
 
-                    <td style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-main)' }}>
+                    <td style={{ padding: '16px 20px', fontWeight: 600, color: '#0f172a' }}>
                       {p.fullName}
                     </td>
 
-                    <td style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>
+                    <td style={{ padding: '16px 20px', color: '#64748b' }}>
                       {p.dateOfBirth}
                     </td>
 
-                    <td style={{ padding: '16px 20px', color: 'var(--text-muted)' }}>
+                    <td style={{ padding: '16px 20px', color: '#64748b' }}>
                       {p.gender}
                     </td>
 
@@ -416,23 +416,23 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                         fontWeight: 700,
                         padding: '3px 8px',
                         borderRadius: '6px',
-                        background: 'var(--emerald-light)',
-                        color: 'var(--emerald)',
-                        border: '1px solid rgba(16, 185, 129, 0.3)'
+                        background: '#d1fae5',
+                        color: '#059669',
+                        border: '1px solid #a7f3d0'
                       }}>
                         {p.bloodGroup || 'Unspecified'}
                       </span>
                     </td>
 
                     <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: '#64748b' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Phone size={12} color="var(--text-subtle)" />
+                          <Phone size={12} color="#94a3b8" />
                           <span>{p.phone}</span>
                         </div>
                         {p.email && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Mail size={12} color="var(--text-subtle)" />
+                            <Mail size={12} color="#94a3b8" />
                             <span>{p.email}</span>
                           </div>
                         )}
@@ -446,9 +446,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                         style={{
                           padding: '8px 14px',
                           borderRadius: 'var(--radius-sm)',
-                          background: 'var(--primary-light)',
-                          border: '1px solid var(--border-accent)',
-                          color: '#a5b4fc',
+                          background: '#e0f2fe',
+                          border: '1px solid #bae6fd',
+                          color: '#0284c7',
                           fontSize: '13px',
                           fontWeight: 600,
                           cursor: 'pointer',
@@ -485,8 +485,8 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
           position: 'fixed',
           inset: 0,
           zIndex: 100,
-          background: 'rgba(5, 8, 15, 0.8)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(15, 23, 42, 0.4)',
+          backdropFilter: 'blur(6px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -501,7 +501,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
             display: 'flex',
             flexDirection: 'column',
             gap: '20px',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 20px 40px rgba(15, 23, 42, 0.15)'
           }}>
             
             {/* Modal Header */}
@@ -511,19 +513,19 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   width: '40px',
                   height: '40px',
                   borderRadius: '10px',
-                  background: 'var(--primary-light)',
+                  background: '#e0f2fe',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--primary)'
+                  color: '#0284c7'
                 }}>
                   <UserPlus size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-main)' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a' }}>
                     Register New Patient
                   </h3>
-                  <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <p style={{ fontSize: '12px', color: '#64748b' }}>
                     Backend auto-generates business PAT-XXXX identifier
                   </p>
                 </div>
@@ -535,7 +537,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: 'var(--text-muted)',
+                  color: '#64748b',
                   cursor: 'pointer',
                   padding: '6px',
                   borderRadius: '6px'
@@ -550,9 +552,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
               <div style={{
                 padding: '12px 14px',
                 borderRadius: 'var(--radius-sm)',
-                background: 'var(--rose-light)',
-                border: '1px solid rgba(244, 63, 94, 0.3)',
-                color: 'var(--rose)',
+                background: '#fee2e2',
+                border: '1px solid #fca5a5',
+                color: '#dc2626',
                 fontSize: '13px',
                 display: 'flex',
                 alignItems: 'center',
@@ -568,8 +570,8 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
               
               {/* Full Name */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
-                  Full Name <span style={{ color: 'var(--rose)' }}>*</span>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
+                  Full Name <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="text"
@@ -580,9 +582,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   style={{
                     padding: '10px 14px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.8)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-main)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     fontSize: '14px',
                     outline: 'none'
                   }}
@@ -592,8 +594,8 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
               {/* DOB & Gender Row */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
-                    Date of Birth <span style={{ color: 'var(--rose)' }}>*</span>
+                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
+                    Date of Birth <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="date"
@@ -603,9 +605,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(11, 15, 25, 0.8)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-main)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      color: '#0f172a',
                       fontSize: '14px',
                       outline: 'none'
                     }}
@@ -613,8 +615,8 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
-                    Gender <span style={{ color: 'var(--rose)' }}>*</span>
+                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
+                    Gender <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <select
                     value={gender}
@@ -622,9 +624,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(11, 15, 25, 0.8)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-main)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      color: '#0f172a',
                       fontSize: '14px',
                       outline: 'none',
                       cursor: 'pointer'
@@ -640,8 +642,8 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
               {/* Phone & Blood Group Row */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
-                    Phone Number <span style={{ color: 'var(--rose)' }}>*</span>
+                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
+                    Phone Number <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -652,9 +654,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(11, 15, 25, 0.8)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-main)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      color: '#0f172a',
                       fontSize: '14px',
                       outline: 'none'
                     }}
@@ -662,7 +664,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
+                  <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
                     Blood Group
                   </label>
                   <select
@@ -671,9 +673,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                     style={{
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(11, 15, 25, 0.8)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-main)',
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      color: '#0f172a',
                       fontSize: '14px',
                       outline: 'none',
                       cursor: 'pointer'
@@ -693,7 +695,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
 
               {/* Email */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
                   Email Address (Optional)
                 </label>
                 <input
@@ -704,9 +706,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   style={{
                     padding: '10px 14px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.8)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-main)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     fontSize: '14px',
                     outline: 'none'
                   }}
@@ -715,7 +717,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
 
               {/* Address */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
+                <label style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>
                   Home / Residential Address (Optional)
                 </label>
                 <input
@@ -726,9 +728,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   style={{
                     padding: '10px 14px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(11, 15, 25, 0.8)',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-main)',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#0f172a',
                     fontSize: '14px',
                     outline: 'none'
                   }}
@@ -744,9 +746,9 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   style={{
                     padding: '10px 18px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'transparent',
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--text-muted)',
+                    background: '#f8fafc',
+                    border: '1px solid #cbd5e1',
+                    color: '#64748b',
                     fontSize: '14px',
                     fontWeight: 600,
                     cursor: isSubmitting ? 'not-allowed' : 'pointer'
@@ -761,7 +763,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                   style={{
                     padding: '10px 22px',
                     borderRadius: 'var(--radius-sm)',
-                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)',
+                    background: '#0ea5e9',
                     border: 'none',
                     color: '#ffffff',
                     fontSize: '14px',
@@ -770,7 +772,7 @@ export const PatientsPage: React.FC<PatientsPageProps> = ({ onSelectPatient }) =
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    boxShadow: '0 4px 14px rgba(99, 102, 241, 0.35)',
+                    boxShadow: '0 4px 12px rgba(14, 165, 233, 0.25)',
                     opacity: isSubmitting ? 0.8 : 1
                   }}
                 >
